@@ -1,0 +1,11 @@
+/Library
+/Temp
+/UnityPackageManager
+/.idea
+/Assets/.idea
+/Assets/Plugins
+
+*.sln
+*.csproj
+*.md
+
