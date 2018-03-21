@@ -11,7 +11,8 @@ public class MovingPoint : MonoBehaviour
 	{
 		velocity = Random.insideUnitCircle * 0.01f;
 	}
-
+	
+	//Called every frame
 	void Update()
 	{
 		transform.Translate(velocity);	
