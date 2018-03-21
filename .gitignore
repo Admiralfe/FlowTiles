@@ -4,6 +4,7 @@
 /.idea
 /Assets/.idea
 /Assets/Plugins
+/.vs
 
 *.sln
 *.csproj

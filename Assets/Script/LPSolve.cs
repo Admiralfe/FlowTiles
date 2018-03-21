@@ -3,12 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using lpsolve55;
 
-public class LPSolve
-{
-    public static int buildInitialModel(int minXFlux, int maxXFlux, int minYFlux, int maxYFlux, int noOfNeighbors)
-    {
-        int lpModel;
-        int noOfColumns;
+public class LPSolve {
 
-        lpsolve.make_lp(0,0);
+    public static System.IntPtr lpModel;
+
+    public static bool BuildInitialModel(int minXFlux, int maxXFlux, int minYFlux, int maxYFlux, int gridDimension, int objectElement)
+    {
+
+        //Number of variables is 2*n*(n+1) for n x n - grid.
+        lpModel = lpsolve.make_lp(0, 2 * gridDimension * (gridDimension + 1));
+        
+        if (lpModel.ToInt32() == 0)
+        {
+            return false;
+        }
+
+
+
+        return true;
     }
+}
