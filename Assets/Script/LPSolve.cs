@@ -23,9 +23,62 @@ public class LPSolve
         
         //Improves performance when adding rows to model
         lpsolve.set_add_rowmode(LpModel, 1);
-        
-        
-        
+
+        //Flows are defined to be positive in the direction corresponding to increasing index
+        double[] rowVector = { -1, -1, 1, 1 };
+
+        //We always have four variables in the constraint
+        int[] tileEdges = new int[4];
+
+        //Iterate over all rows and columns in the grid
+        for (int row = 0; row < gridDimension; row++)
+        {
+            for (int column = 0; column < gridDimension; column++)
+            {
+                //Array with the indexes of each edge
+                tileEdges = tileEdgeIndices(row, column, gridDimension);
+
+                if (!currentTileGrid.hasTile(row, column))
+                {
+                    lpsolve.add_constraintex(LpModel, 4, rowVector, tileEdges,
+                        lpsolve.lpsolve_constr_types.EQ, 0);
+
+                    //Set the bounds for each edge flow. Zero if it is a boundary edge.
+                    if (row == 0)
+                        lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Top], 0, 0);
+                    else
+                        lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Top], minYFlux, maxYFlux);
+                    if (column == 0)
+                        lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Left], 0, 0);
+                    else
+                        lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Left], minXFlux, maxXFlux);
+                    if (row == gridDimension - 1)
+                        lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Bottom], 0, 0);
+                    else
+                        lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Bottom], minYFlux, maxYFlux);
+                    if (column == gridDimension - 1)
+                        lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Right], 0, 0);
+                    else
+                        lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Right], minXFlux, maxXFlux);
+                }
+                //Else there is a tile on the slot and the values are bounded by the flows from that tile
+                else
+                {
+                    lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Top],
+                        currentTileGrid.TileSet[row, column][(int)Direction.Top], currentTileGrid.TileSet[row, column][(int)Direction.Top]);
+
+                    lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Right],
+                        currentTileGrid.TileSet[row, column][(int)Direction.Right], currentTileGrid.TileSet[row, column][(int)Direction.Right]);
+
+                    lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Bottom],
+                        currentTileGrid.TileSet[row, column][(int)Direction.Bottom], currentTileGrid.TileSet[row, column][(int)Direction.Bottom]);
+
+                    lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Left],
+                        currentTileGrid.TileSet[row, column][(int)Direction.Left], currentTileGrid.TileSet[row, column][(int)Direction.Left]);
+                }
+            }
+        }
+
         /*
         //Set flows on the top and bottom boundary of the grid to 0
         for (int n = 0; n < gridDimension; n++)
@@ -61,35 +114,8 @@ public class LPSolve
             }
         }
         
-        */
         
-        double[] rowVector ={ -1, -1, 1, 1 };
         
-        //We always have four variables in the constraint
-        int[] tileEdges = new int[4];
-
-        for (int row = 0; row < gridDimension; row++)
-        {
-            for (int column = 0; column < gridDimension; column++)
-            {
-                tileEdges = tileEdgeIndices(row, column, gridDimension);
-                
-                if (!currentTileGrid.hasTile(row, column))
-                {
-                    lpsolve.add_constraintex(LpModel, 4, rowVector, tileEdges,
-                        lpsolve.lpsolve_constr_types.EQ, 0);
-                }
-                else
-                {    
-                    
-                    //Check for edge tiles.
-                    foreach (int tileEdge in tileEdges)
-                        lpsolve.set_bounds(LpModel, tileEdge, minXFlux, maxXFlux);
-                }
-            }
-        }
-        
-        /*
         //Set all constraints
         for (int currentCell = 0; currentCell < gridDimension * gridDimension; currentCell++)
         {
