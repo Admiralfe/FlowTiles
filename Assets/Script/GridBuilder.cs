@@ -5,7 +5,22 @@ using UnityEngine;
 
 public class GridBuilder
 {
-    private List<int[]> currentValidTiles;
+    private struct FlowTile
+    {
+        private int topFlux, rightFlux, bottomFlux, leftFlux;
+        private Vector2 edgeVelocity;
+
+        public FlowTile(int topFluxIn, int rightFluxIn, int bottomFluxIn, int leftFluxIn, Vector2 edgeVelocityIn)
+        {
+            topFlux = topFluxIn;
+            rightFlux = rightFluxIn;
+            bottomFlux = bottomFluxIn;
+            leftFlux = leftFluxIn;
+            edgeVelocity = edgeVelocityIn;
+        }
+    }
+    
+    private List<FlowTile> currentValidTiles;
     
     private int minXFlux;
     private int maxXFlux;
@@ -24,7 +39,8 @@ public class GridBuilder
         
         //LPSolve.BuildInitialModel(minXFlux, maxXFlux, minYFlux, maxYFlux);
     }
-
+    
+    //Finds valid tiles in position rowNumber, colNumber and adds them to currentValidTiles
     private void SetValidTiles(int rowNumber, int colNumber)
     {
         int[] validTopFluxRange = new int[2];
@@ -89,6 +105,24 @@ public class GridBuilder
             validRightFluxRange[1] = LPSolve.SolveModel();
         }
         
+        //Create all possible FlowTiles given the bounds on flows. This set still needs to be filtered
+        foreach (int i in validTopFluxRange)
+        {
+            foreach (int j in validRightFluxRange)
+            {
+                foreach (int k in validBottomFluxRange)
+                {
+                    foreach (int l in validLeftFluxRange)
+                    {
+                        currentValidTiles.Add(new FlowTile(i, j, k, l, Vector2.zero));
+                    }
+                }
+            }
+        }
+    }
+
+    private void filterValidTiles()
+    {
         
     }
 }

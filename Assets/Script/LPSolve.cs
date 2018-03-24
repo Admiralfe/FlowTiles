@@ -242,4 +242,11 @@ public class LPSolve
 
         return result;
     }
+
+    public static void Main(string[] args)
+    {
+        BuildInitialModel(-1, 1, -1, 1, new TileGrid(4));
+        
+        lpsolve.print_lp(LpModel);
+    }
 }
