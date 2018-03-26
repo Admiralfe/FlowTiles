@@ -5,30 +5,29 @@ using UnityEngine;
 
 public class GridBuilder
 {
-    private struct FlowTile
+    public struct FlowTile
     {
-        private int topFlux, rightFlux, bottomFlux, leftFlux;
-        private Vector2 edgeVelocity;
+        public int topFlux, rightFlux, bottomFlux, leftFlux;
+        public Vector2 cornerVelocity;
 
-        public FlowTile(int topFluxIn, int rightFluxIn, int bottomFluxIn, int leftFluxIn, Vector2 edgeVelocityIn)
+        public FlowTile(int topFluxIn, int rightFluxIn, int bottomFluxIn, int leftFluxIn, Vector2 cornerVelocityIn)
         {
             topFlux = topFluxIn;
             rightFlux = rightFluxIn;
             bottomFlux = bottomFluxIn;
             leftFlux = leftFluxIn;
-            edgeVelocity = edgeVelocityIn;
+            cornerVelocity = cornerVelocityIn;
         }
     }
-    
-    private List<FlowTile> currentValidTiles;
-    
+
+
     private int minXFlux;
     private int maxXFlux;
     private int minYFlux;
     private int maxYFlux;
 
     public int gridDimension;
-    
+
     public GridBuilder(int minXFluxIn, int maxXFluxIn, int minYFluxIn, int maxYFluxIn, int gridDimensionIn)
     {
         minXFlux = minXFluxIn;
@@ -36,10 +35,10 @@ public class GridBuilder
         minYFlux = minYFluxIn;
         maxYFlux = maxYFluxIn;
         gridDimension = gridDimensionIn;
-        
+
         //LPSolve.BuildInitialModel(minXFlux, maxXFlux, minYFlux, maxYFlux);
     }
-    
+
     //Finds valid tiles in position rowNumber, colNumber and adds them to currentValidTiles
     private void SetValidTiles(int rowNumber, int colNumber)
     {
@@ -47,9 +46,9 @@ public class GridBuilder
         int[] validBottomFluxRange = new int[2];
         int[] validLeftFluxRange = new int[2];
         int[] validRightFluxRange = new int[2];
-        
+
         int sourceCell = rowNumber * gridDimension + colNumber;
-        
+
         if (rowNumber == 0)
         {
             validTopFluxRange[0] = 0;
@@ -104,7 +103,9 @@ public class GridBuilder
             LPSolve.SetEdgeToSolve(sourceCell, sourceCell + 1, gridDimension, true, true);
             validRightFluxRange[1] = LPSolve.SolveModel();
         }
-        
+
+        List<FlowTile> currentValidTiles = new List<FlowTile>();
+
         //Create all possible FlowTiles given the bounds on flows. This set still needs to be filtered
         foreach (int i in validTopFluxRange)
         {
@@ -119,10 +120,10 @@ public class GridBuilder
                 }
             }
         }
-    }
 
-    private void filterValidTiles()
-    {
-        
+        LPSolve.FilterValidTiles(ref currentValidTiles, rowNumber, colNumber, gridDimension);
+
     }
 }
+
+
