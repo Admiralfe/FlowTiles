@@ -1,29 +1,68 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Linq;
 
-public class TileGrid
+public class TileGrid : IEnumerable<TileGrid.FlowTile>
 {
+    public class FlowTile
+    {
+        //public Vector2 cornerVelocity;
+
+        public int TopFlux { get; }
+        public int RightFlux { get; }
+        public int BottomFlux { get; }
+        public int LeftFlux { get; }
+
+        public FlowTile(int topFluxIn, int rightFluxIn, int bottomFluxIn, int leftFluxIn)
+        {
+            TopFlux = topFluxIn;
+            RightFlux = rightFluxIn;
+            BottomFlux = bottomFluxIn;
+            LeftFlux = leftFluxIn;
+            //cornerVelocity = cornerVelocityIn;
+        }
+    }
+
     public int Dimension;
-    
-    //Rows are flow and velocity values for tile on the position given by the column index.
-    public int[,][] TileSet;
+
+    //Rows and columns in the 2d part
+    private FlowTile[,] TileSet;
 
     public TileGrid(int gridDimensionIn)
     {
         Dimension = gridDimensionIn;
-        
-        TileSet = new int[Dimension, Dimension][];
+
+        TileSet = new FlowTile[Dimension, Dimension];
     }
 
-    public bool hasTile(int rowIndex, int colIndex)
+    public bool HasTile(int rowIndex, int colIndex)
     {
         return (TileSet[rowIndex, colIndex] != null);
     }
 
-    public void addTile(int rowIndex, int colIndex, int[] tileValues)
+    public void AddTile(int rowIndex, int colIndex, FlowTile flowTile)
     {
-        TileSet[rowIndex, colIndex] = tileValues;
+        TileSet[rowIndex, colIndex] = flowTile;
     }
 
+    public FlowTile GetFlowTile(int rowIndex, int colIndex)
+    {
+        return TileSet[rowIndex, colIndex];
+    }
+
+    public IEnumerator<FlowTile> GetEnumerator()
+    {
+        for (int row = 0; row < Dimension; row++)
+        {
+            for (int col = 0; col < Dimension; col++)
+            {
+                yield return TileSet[row, col];
+            }
+        }
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 }

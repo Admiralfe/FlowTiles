@@ -1,25 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Linq;
+using System.Text;
 
 public class GridBuilder
 {
-    public struct FlowTile
-    {
-        public int topFlux, rightFlux, bottomFlux, leftFlux;
-        public Vector2 cornerVelocity;
-
-        public FlowTile(int topFluxIn, int rightFluxIn, int bottomFluxIn, int leftFluxIn, Vector2 cornerVelocityIn)
-        {
-            topFlux = topFluxIn;
-            rightFlux = rightFluxIn;
-            bottomFlux = bottomFluxIn;
-            leftFlux = leftFluxIn;
-            cornerVelocity = cornerVelocityIn;
-        }
-    }
-
 
     private int minXFlux;
     private int maxXFlux;
@@ -39,8 +24,26 @@ public class GridBuilder
         //LPSolve.BuildInitialModel(minXFlux, maxXFlux, minYFlux, maxYFlux);
     }
 
-    //Finds valid tiles in position rowNumber, colNumber and adds them to currentValidTiles
-    private void SetValidTiles(int rowNumber, int colNumber)
+    public TileGrid BuildRandomTileGrid()
+    {
+        Random RNG = new Random();
+        TileGrid currentTileGrid = new TileGrid(gridDimension);
+        for (int row = 0; row < gridDimension; row++)
+        {
+            for (int col = 0; col < gridDimension; col++)
+            {
+                LPSolve.BuildInitialModel(-1, 1, -1, 1, currentTileGrid);
+                List<TileGrid.FlowTile> validTiles = ValidTiles(row, col);
+                currentTileGrid.AddTile(row, col, validTiles[RNG.Next(0, validTiles.Count - 1)]);
+                LPSolve.FreeModel();
+            }
+        }
+
+        return currentTileGrid;
+    }
+
+    //Finds valid tiles in position rowNumber, colNumber and returns a list
+    private List<TileGrid.FlowTile> ValidTiles(int rowNumber, int colNumber)
     {
         int[] validTopFluxRange = new int[2];
         int[] validBottomFluxRange = new int[2];
@@ -104,25 +107,29 @@ public class GridBuilder
             validRightFluxRange[1] = LPSolve.SolveModel();
         }
 
-        List<FlowTile> currentValidTiles = new List<FlowTile>();
+        List<TileGrid.FlowTile> currentValidTiles = new List<TileGrid.FlowTile>();
 
         //Create all possible FlowTiles given the bounds on flows. This set still needs to be filtered
-        foreach (int i in validTopFluxRange)
+        for (int i = validTopFluxRange[0]; i <= validTopFluxRange[1]; i++)
         {
-            foreach (int j in validRightFluxRange)
+            for (int j = validRightFluxRange[0]; j <= validRightFluxRange[1]; j++)
             {
-                foreach (int k in validBottomFluxRange)
+                for (int k = validBottomFluxRange[0]; k <= validBottomFluxRange[1]; k++)
                 {
-                    foreach (int l in validLeftFluxRange)
+                    for (int l = validLeftFluxRange[0]; l <= validLeftFluxRange[1]; l++)
                     {
-                        currentValidTiles.Add(new FlowTile(i, j, k, l, Vector2.zero));
+                        currentValidTiles.Add(new TileGrid.FlowTile(i, j, k, l));
                     }
                 }
             }
         }
 
-        LPSolve.FilterValidTiles(ref currentValidTiles, rowNumber, colNumber, gridDimension);
+        Console.WriteLine("number of tiles: " + currentValidTiles.Count);
 
+        List<TileGrid.FlowTile> newValidTiles = LPSolve.FilterValidTiles(currentValidTiles, rowNumber, colNumber, gridDimension);
+
+        Console.WriteLine("final number of tiles: " + newValidTiles.Count);
+        return newValidTiles;
     }
 }
 
