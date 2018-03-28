@@ -35,9 +35,18 @@ public class GridBuilder
         {
             for (int col = 0; col < gridDimension; col++)
             {
-                LPSolve.BuildInitialModel(-1, 1, -1, 1, currentTileGrid);
+                LPSolve.BuildInitialModel(minXFlux, maxXFlux, minYFlux, maxYFlux, currentTileGrid);
                 List<FlowTile> validTiles = ValidTiles(row, col);
-                currentTileGrid.AddTile(row, col, validTiles[RNG.Next(0, validTiles.Count - 1)]);
+                FlowTile newTile = validTiles[RNG.Next(0, validTiles.Count - 1)];
+                /*
+                Console.WriteLine("(" + row + ", " + col + ")");
+                Console.WriteLine("Top: " + newTile.Flux.topEdge);
+                Console.WriteLine("Right: " + newTile.Flux.rightEdge);
+                Console.WriteLine("Bottom: " + newTile.Flux.bottomEdge);
+                Console.WriteLine("Left: " + newTile.Flux.leftEdge);
+                */
+                currentTileGrid.AddTile(row, col, newTile);
+
                 LPSolve.FreeModel();
             }
         }
@@ -53,8 +62,6 @@ public class GridBuilder
         int[] validLeftFluxRange = new int[2];
         int[] validRightFluxRange = new int[2];
 
-        int sourceCell = rowNumber * gridDimension + colNumber;
-
         if (rowNumber == 0)
         {
             validTopFluxRange[0] = 0;
@@ -62,9 +69,9 @@ public class GridBuilder
         }
         else
         {
-            LPSolve.SetEdgeToSolve(sourceCell, sourceCell - gridDimension, gridDimension, false, false);
+            LPSolve.SetEdgeToSolve(rowNumber, colNumber, LPSolve.Direction.Top, gridDimension, false);
             validTopFluxRange[0] = LPSolve.SolveModel();
-            LPSolve.SetEdgeToSolve(sourceCell, sourceCell - gridDimension, gridDimension, false, true);
+            LPSolve.SetEdgeToSolve(rowNumber, colNumber, LPSolve.Direction.Top, gridDimension, true);
             validTopFluxRange[1] = LPSolve.SolveModel();
         }
 
@@ -76,9 +83,9 @@ public class GridBuilder
 
         else
         {
-            LPSolve.SetEdgeToSolve(sourceCell, sourceCell + gridDimension, gridDimension, false, false);
+            LPSolve.SetEdgeToSolve(rowNumber, colNumber, LPSolve.Direction.Bottom, gridDimension, false);
             validBottomFluxRange[0] = LPSolve.SolveModel();
-            LPSolve.SetEdgeToSolve(sourceCell, sourceCell + gridDimension, gridDimension, false, true);
+            LPSolve.SetEdgeToSolve(rowNumber, colNumber, LPSolve.Direction.Bottom, gridDimension, true);
             validBottomFluxRange[1] = LPSolve.SolveModel();
         }
 
@@ -90,9 +97,9 @@ public class GridBuilder
 
         else
         {
-            LPSolve.SetEdgeToSolve(sourceCell, sourceCell - 1, gridDimension, true, false);
+            LPSolve.SetEdgeToSolve(rowNumber, colNumber, LPSolve.Direction.Left, gridDimension, false);
             validLeftFluxRange[0] = LPSolve.SolveModel();
-            LPSolve.SetEdgeToSolve(sourceCell, sourceCell - 1, gridDimension, true, true);
+            LPSolve.SetEdgeToSolve(rowNumber, colNumber, LPSolve.Direction.Left, gridDimension, true);
             validLeftFluxRange[1] = LPSolve.SolveModel();
         }
 
@@ -104,9 +111,9 @@ public class GridBuilder
 
         else
         {
-            LPSolve.SetEdgeToSolve(sourceCell, sourceCell + 1, gridDimension, true, false);
+            LPSolve.SetEdgeToSolve(rowNumber, colNumber, LPSolve.Direction.Right, gridDimension, false);
             validRightFluxRange[0] = LPSolve.SolveModel();
-            LPSolve.SetEdgeToSolve(sourceCell, sourceCell + 1, gridDimension, true, true);
+            LPSolve.SetEdgeToSolve(rowNumber, colNumber, LPSolve.Direction.Right, gridDimension, true);
             validRightFluxRange[1] = LPSolve.SolveModel();
         }
 
@@ -126,13 +133,20 @@ public class GridBuilder
                         flux.rightEdge = j;
                         flux.bottomEdge = k;
                         flux.leftEdge = l;
-                        
+
                         currentValidTiles.Add(new FlowTile(innerTileGridDimension, flux, new CornerVelocities()));
                     }
                 }
             }
         }
 
+        foreach (FlowTile tile in currentValidTiles)
+        {
+            Console.WriteLine("Top: " + tile.Flux.topEdge);
+            Console.WriteLine("Right: " + tile.Flux.rightEdge);
+            Console.WriteLine("Bottom: " + tile.Flux.bottomEdge);
+            Console.WriteLine("Left: " + tile.Flux.leftEdge + "\n");
+        }
         Console.WriteLine("number of tiles: " + currentValidTiles.Count);
 
         List<FlowTile> newValidTiles = LPSolve.FilterValidTiles(currentValidTiles, rowNumber, colNumber, gridDimension);

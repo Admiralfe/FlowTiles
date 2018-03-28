@@ -9,7 +9,7 @@ public class LPSolve
 {
     private static System.IntPtr LpModel;
 
-    private enum Direction { Top, Right, Bottom, Left }
+    public enum Direction { Top, Right, Bottom, Left }
 
     /* Creates a linear programming model for solving a specific network flow problem.
      */
@@ -42,6 +42,7 @@ public class LPSolve
         }
         //Add row mode has to be turned off before continuing with other operations, if not then program crashes.
         lpsolve.set_add_rowmode(LpModel, 0);
+        bool[] edgeSetFlag = new bool[2 * gridDimension * (gridDimension + 1) + 1];
 
         //Iterate over all rows and columns in the grid and set bounds on variables.
         for (int row = 0; row < gridDimension; row++)
@@ -53,98 +54,75 @@ public class LPSolve
                 if (!currentTileGrid.HasTile(row, column))
                 {
                     //Set the bounds for each edge flow. Zero if it is a boundary edge.
-                    if (row == 0)
+                    if (!edgeSetFlag[tileEdges[(int)Direction.Top]])
                     {
-                        if (lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Top], 0, 0) == 0)
-                        {
-                            System.Console.WriteLine("Set bounds error");
-                        }
-                    }
-                    else
-                    {
-                        if (lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Top], minYFlux, maxYFlux) == 0)
-                        {
-                            System.Console.WriteLine("Set bounds error");
-                        }
+                        if (row == 0)
+                            lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Top], 0, 0);
+                        else
+                            lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Top], minYFlux, maxYFlux);
                     }
 
-                    if (column == 0)
+                    if (!edgeSetFlag[tileEdges[(int)Direction.Right]])
                     {
-                        if (lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Left], 0, 0) == 0)
-                        {
-                            System.Console.WriteLine("Set bounds error");
-                        }
-                    }
-                    else
-                    {
-                        if (lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Left], minXFlux, maxXFlux) == 0)
-                        {
-                            System.Console.WriteLine("Set bounds error");
-                        }
+                        if (column == 0)
+                            lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Left], 0, 0);
+                        else
+                            lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Left], minXFlux, maxXFlux);
                     }
 
-                    if (row == gridDimension - 1)
+                    if (!edgeSetFlag[tileEdges[(int)Direction.Bottom]])
                     {
-                        if (lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Bottom], 0, 0) == 0)
-                        {
-                            System.Console.WriteLine("Set bounds error");
-                        }
-                    }
-                    else
-                    {
-                        if (lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Bottom], minYFlux, maxYFlux) == 0)
-                        {
-                            System.Console.WriteLine("Set bounds error");
-                        }
+                        if (row == gridDimension - 1)
+                            lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Bottom], 0, 0);
+                        else
+                            lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Bottom], minYFlux, maxYFlux);
                     }
 
-                    if (column == gridDimension - 1)
+                    if (!edgeSetFlag[tileEdges[(int)Direction.Left]])
                     {
-                        if (lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Right], 0, 0) == 0)
-                        {
-                            System.Console.WriteLine("Set bounds error");
-                        }
-                    }
-                    else
-                    {
-                        if (lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Right], minXFlux, maxXFlux) == 0)
-                        {
-                            System.Console.WriteLine("Set bounds error");
-                        }
+                        if (column == gridDimension - 1)
+                            lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Right], 0, 0);
+                        else
+                            lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Right], minXFlux, maxXFlux);
                     }
                 }
                 //Else there is a tile on the slot and the values are bounded by the flows from that tile
                 else
                 {
                     lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Top],
-                        currentTileGrid.GetFlowTile(row, column).Flux.topEdge, 
+                        currentTileGrid.GetFlowTile(row, column).Flux.topEdge,
                         currentTileGrid.GetFlowTile(row, column).Flux.topEdge);
 
+                    edgeSetFlag[tileEdges[(int)Direction.Top]] = true;
+
                     lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Right],
-                        currentTileGrid.GetFlowTile(row, column).Flux.rightEdge, 
+                        currentTileGrid.GetFlowTile(row, column).Flux.rightEdge,
                         currentTileGrid.GetFlowTile(row, column).Flux.rightEdge);
 
+                    edgeSetFlag[tileEdges[(int)Direction.Right]] = true;
+
                     lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Bottom],
-                        currentTileGrid.GetFlowTile(row, column).Flux.bottomEdge, 
+                        currentTileGrid.GetFlowTile(row, column).Flux.bottomEdge,
                         currentTileGrid.GetFlowTile(row, column).Flux.bottomEdge);
 
-                    lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Left], 
-                        currentTileGrid.GetFlowTile(row, column).Flux.leftEdge, 
+                    edgeSetFlag[tileEdges[(int)Direction.Bottom]] = true;
+
+                    lpsolve.set_bounds(LpModel, tileEdges[(int)Direction.Left],
+                        currentTileGrid.GetFlowTile(row, column).Flux.leftEdge,
                         currentTileGrid.GetFlowTile(row, column).Flux.leftEdge);
+
+                    edgeSetFlag[tileEdges[(int)Direction.Left]] = true;
                 }
             }
         }
 
         lpsolve.set_verbose(LpModel, 0);
-        LPSolve.BuildInitialModel(-1, 1, -1, 1, new TileGrid(5));
-        lpsolve.print_lp(LpModel);
-     
     }
 
-    public static void SetEdgeToSolve(int sourceCell, int destCell, int gridDimension, bool isXDirection, bool maximize)
+    public static void SetEdgeToSolve(int row, int col, Direction direction, int gridDimension, bool maximize)
     {
         double[] rowVector = { 1 };
-        int[] constraintVector = { GridToEdgeIndex(sourceCell, destCell, gridDimension, isXDirection) };
+        int[] constraintVector = { TileEdgeIndices(row, col, gridDimension)[(int)direction] };
 
         //Sets the variable, that is edge, to solve for
         if (lpsolve.set_obj_fnex(LpModel, 1, rowVector, constraintVector) == 0)
@@ -154,13 +132,9 @@ public class LPSolve
 
         //Sets if we want to maximize or minimize the flux
         if (maximize)
-        {
             lpsolve.set_maxim(LpModel);
-        }
         else
-        {
             lpsolve.set_minim(LpModel);
-        }
 
         //lpsolve.set_simplextype(LpModel, lpsolve.lpsolve_simplextypes.SIMPLEX_PRIMAL_PRIMAL);
     }
@@ -248,7 +222,7 @@ public class LPSolve
         return result;
     }
 
-    public static List<FlowTile> FilterValidTiles(List<FlowTile> currentValidTiles, 
+    public static List<FlowTile> FilterValidTiles(List<FlowTile> currentValidTiles,
         int rowNumber, int colNumber, int gridDimension)
     {
         int[] variableIndex = new int[1];
@@ -258,19 +232,19 @@ public class LPSolve
         {
             //Add constraints corresponding to the tile edge flows
             variableIndex[0] = TileEdgeIndices(rowNumber, colNumber, gridDimension)[(int)Direction.Top];
-            lpsolve.add_constraintex(LpModel, 1, new double[] { 1 }, 
+            lpsolve.add_constraintex(LpModel, 1, new double[] { 1 },
                 variableIndex, lpsolve.lpsolve_constr_types.EQ, tile.Flux.topEdge);
 
             variableIndex[0] = TileEdgeIndices(rowNumber, colNumber, gridDimension)[(int)Direction.Right];
-            lpsolve.add_constraintex(LpModel, 1, new double[] { 1 }, 
+            lpsolve.add_constraintex(LpModel, 1, new double[] { 1 },
                 variableIndex, lpsolve.lpsolve_constr_types.EQ, tile.Flux.rightEdge);
 
             variableIndex[0] = TileEdgeIndices(rowNumber, colNumber, gridDimension)[(int)Direction.Bottom];
-            lpsolve.add_constraintex(LpModel, 1, new double[] { 1 }, 
+            lpsolve.add_constraintex(LpModel, 1, new double[] { 1 },
                 variableIndex, lpsolve.lpsolve_constr_types.EQ, tile.Flux.bottomEdge);
 
             variableIndex[0] = TileEdgeIndices(rowNumber, colNumber, gridDimension)[(int)Direction.Left];
-            lpsolve.add_constraintex(LpModel, 1, new double[] { 1 }, 
+            lpsolve.add_constraintex(LpModel, 1, new double[] { 1 },
                 variableIndex, lpsolve.lpsolve_constr_types.EQ, tile.Flux.leftEdge);
 
             //If a feasible solution is found, tile is a possibility for the location
@@ -293,20 +267,36 @@ public class LPSolve
     public static void Main(string[] args)
     {
         /*   System.Console.WriteLine(lpsolve.get_Nrows(LpModel));
+        TileGrid myTileGrid = new TileGrid(dimension);
+        Flux flux = new Flux
+        {
+            topEdge = 0,
+            bottomEdge = -1,
+            rightEdge = 1,
+            leftEdge = 0
+        };
+
+        myTileGrid.AddTile(0, 0, new FlowTile(10, flux, new CornerVelocities()));
+
+        BuildInitialModel(-1, 1, -1, 1, myTileGrid);
+        lpsolve.print_lp(LpModel);
         */
-        int dimension = 3;
-        GridBuilder gridBuilder = new GridBuilder(-1, 1, -1, 1, dimension);
+
+        int dimension = 5;
+
+        GridBuilder gridBuilder = new GridBuilder(-3, 3, -3, 3, dimension);
         TileGrid tileGrid = gridBuilder.BuildRandomTileGrid();
         for (int row = 0; row < dimension; row++)
         {
             for (int col = 0; col < dimension; col++)
             {
                 FlowTile currentTile = tileGrid.GetFlowTile(row, col);
-                System.Console.WriteLine("Position " + "(" + row + "," + col + ")" + " : top = " + 
+                System.Console.WriteLine("Position " + "(" + row + "," + col + ")" + " : top = " +
                     currentTile.Flux.topEdge + ", right = " + currentTile.Flux.rightEdge +
                     ", bottom = " + currentTile.Flux.bottomEdge + ", left = " + currentTile.Flux.leftEdge);
             }
         }
+
 
     }
 }

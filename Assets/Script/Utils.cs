@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEngine;
 namespace FlowTilesUtils
 {
     public struct Flux
@@ -9,22 +8,22 @@ namespace FlowTilesUtils
         public int topEdge;
         public int bottomEdge;
     };
+
     
-    /*
     public struct Vector2D
     {
-        public double x;
-        public double y;
-        public double Norm() { return Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2)); }
+        public float x;
+        public float y;
+        public float Norm() { return (float)Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2)); }
     };
-    */
+
 
     public struct CornerVelocities
     {
-        public Vector2 topLeft;
-        public Vector2 topRight;
-        public Vector2 bottomLeft;
-        public Vector2 bottomRight;
+        public Vector2D topLeft;
+        public Vector2D topRight;
+        public Vector2D bottomLeft;
+        public Vector2D bottomRight;
     };
     public struct FlowTileCoordinate
     {
