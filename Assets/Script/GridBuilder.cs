@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FlowTilesUtils;
 
 public class GridBuilder
 {
@@ -12,6 +13,8 @@ public class GridBuilder
     private int maxYFlux;
 
     public int gridDimension;
+
+    public int innerTileGridDimension;
 
     public GridBuilder(int minXFluxIn, int maxXFluxIn, int minYFluxIn, int maxYFluxIn, int gridDimensionIn)
     {
@@ -33,7 +36,7 @@ public class GridBuilder
             for (int col = 0; col < gridDimension; col++)
             {
                 LPSolve.BuildInitialModel(-1, 1, -1, 1, currentTileGrid);
-                List<TileGrid.FlowTile> validTiles = ValidTiles(row, col);
+                List<FlowTile> validTiles = ValidTiles(row, col);
                 currentTileGrid.AddTile(row, col, validTiles[RNG.Next(0, validTiles.Count - 1)]);
                 LPSolve.FreeModel();
             }
@@ -43,7 +46,7 @@ public class GridBuilder
     }
 
     //Finds valid tiles in position rowNumber, colNumber and returns a list
-    private List<TileGrid.FlowTile> ValidTiles(int rowNumber, int colNumber)
+    private List<FlowTile> ValidTiles(int rowNumber, int colNumber)
     {
         int[] validTopFluxRange = new int[2];
         int[] validBottomFluxRange = new int[2];
@@ -107,7 +110,7 @@ public class GridBuilder
             validRightFluxRange[1] = LPSolve.SolveModel();
         }
 
-        List<TileGrid.FlowTile> currentValidTiles = new List<TileGrid.FlowTile>();
+        List<FlowTile> currentValidTiles = new List<FlowTile>();
 
         //Create all possible FlowTiles given the bounds on flows. This set still needs to be filtered
         for (int i = validTopFluxRange[0]; i <= validTopFluxRange[1]; i++)
@@ -118,7 +121,13 @@ public class GridBuilder
                 {
                     for (int l = validLeftFluxRange[0]; l <= validLeftFluxRange[1]; l++)
                     {
-                        currentValidTiles.Add(new TileGrid.FlowTile(i, j, k, l));
+                        Flux flux = new Flux();
+                        flux.topEdge = i;
+                        flux.rightEdge = j;
+                        flux.bottomEdge = k;
+                        flux.leftEdge = l;
+                        
+                        currentValidTiles.Add(new FlowTile(innerTileGridDimension, flux, new CornerVelocities()));
                     }
                 }
             }
@@ -126,7 +135,7 @@ public class GridBuilder
 
         Console.WriteLine("number of tiles: " + currentValidTiles.Count);
 
-        List<TileGrid.FlowTile> newValidTiles = LPSolve.FilterValidTiles(currentValidTiles, rowNumber, colNumber, gridDimension);
+        List<FlowTile> newValidTiles = LPSolve.FilterValidTiles(currentValidTiles, rowNumber, colNumber, gridDimension);
 
         Console.WriteLine("final number of tiles: " + newValidTiles.Count);
         return newValidTiles;

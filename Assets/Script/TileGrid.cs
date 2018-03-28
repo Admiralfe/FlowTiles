@@ -1,27 +1,44 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FlowTilesUtils;
 
-public class TileGrid : IEnumerable<TileGrid.FlowTile>
+public class TileGrid : IEnumerable<FlowTile>
 {
+    /*
     public class FlowTile
     {
+
+        private readonly int topFlux, rightFlux, bottomFlux, leftFlux;
         //public Vector2 cornerVelocity;
 
-        public int TopFlux { get; }
-        public int RightFlux { get; }
-        public int BottomFlux { get; }
-        public int LeftFlux { get; }
+        public int TopFlux
+        {
+            get { return topFlux; }
+        }
+        public int RightFlux
+        {
+            get { return rightFlux; }
+        }
+        public int BottomFlux
+        {
+            get { return bottomFlux; }
+        }
+        public int LeftFlux
+        {
+            get { return leftFlux; }
+        }
 
         public FlowTile(int topFluxIn, int rightFluxIn, int bottomFluxIn, int leftFluxIn)
         {
-            TopFlux = topFluxIn;
-            RightFlux = rightFluxIn;
-            BottomFlux = bottomFluxIn;
-            LeftFlux = leftFluxIn;
+            topFlux = topFluxIn;
+            rightFlux = rightFluxIn;
+            bottomFlux = bottomFluxIn;
+            leftFlux = leftFluxIn;
             //cornerVelocity = cornerVelocityIn;
         }
     }
+    */
 
     public int Dimension;
 
