@@ -135,10 +135,7 @@ public class LPSolve
             }
         }
 
-        lpsolve.set_verbose(LpModel, 0);
-        LPSolve.BuildInitialModel(-1, 1, -1, 1, new TileGrid(5));
-        lpsolve.print_lp(LpModel);
-     
+        lpsolve.set_verbose(LpModel, 0);     
     }
 
     public static void SetEdgeToSolve(int sourceCell, int destCell, int gridDimension, bool isXDirection, bool maximize)
