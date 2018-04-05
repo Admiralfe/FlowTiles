@@ -1,5 +1,5 @@
 ﻿using System;
-namespace FlowTilesUtils
+namespace Script.FlowTileUtils
 {
     public struct Flux
     {

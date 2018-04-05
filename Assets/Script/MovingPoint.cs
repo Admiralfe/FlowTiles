@@ -9,7 +9,7 @@ public class MovingPoint : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
-		velocity = Random.insideUnitCircle * 0.01f;
+		velocity = Random.insideUnitCircle * 5f;
 	}
 	
 	//Called every frame

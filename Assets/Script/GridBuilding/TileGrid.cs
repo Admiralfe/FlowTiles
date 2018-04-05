@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using FlowTilesUtils;
+using Script.FlowTileUtils;
 
 public class TileGrid : IEnumerable<FlowTile>
 {
@@ -45,7 +45,7 @@ public class TileGrid : IEnumerable<FlowTile>
     }
 
     public void AddTile(int rowIndex, int colIndex, FlowTile flowTile)
-    {
+    {  
         TileSet[rowIndex, colIndex] = flowTile;
     }
 
