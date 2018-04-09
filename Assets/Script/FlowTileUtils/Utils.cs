@@ -1,6 +1,8 @@
 ﻿using System;
 namespace Script.FlowTileUtils
 {
+    
+    /*
     public struct Flux
     {
         public int leftEdge;
@@ -8,6 +10,7 @@ namespace Script.FlowTileUtils
         public int topEdge;
         public int bottomEdge;
     };
+   */ 
 
     
     public struct Vector2D
@@ -17,7 +20,7 @@ namespace Script.FlowTileUtils
         public float Norm() { return (float)Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2)); }
     };
 
-
+    /*
     public struct CornerVelocities
     {
         public Vector2D topLeft;
@@ -25,6 +28,8 @@ namespace Script.FlowTileUtils
         public Vector2D bottomLeft;
         public Vector2D bottomRight;
     };
+    */
+    
     public struct FlowTileCoordinate
     {
         public FlowTileCoordinate(float xIn, float yIn) { x = xIn; y = yIn; }

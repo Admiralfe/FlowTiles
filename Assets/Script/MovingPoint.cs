@@ -15,6 +15,7 @@ public class MovingPoint : MonoBehaviour
 	//Called every frame
 	void Update()
 	{
+		
 		transform.Translate(velocity * Time.deltaTime);
 	}
 }
