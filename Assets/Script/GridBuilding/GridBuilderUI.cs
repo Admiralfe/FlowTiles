@@ -6,16 +6,24 @@ namespace Script.GridBuilding
 {
     public class GridBuilderUI : MonoBehaviour
     {
+        public int MinXFlux;
+        public int MaxXFlux;
+        public int MinYFlux;
+        public int MaxYFlux;
+        public int GridDimension;
+
+        private GridBuilder gridBuilder;
+
+        public GameObject Background;
+
         private void Start()
         {
-            throw new System.NotImplementedException();
+            gridBuilder = new GridBuilder(MinXFlux, MaxXFlux, MinYFlux, MaxYFlux, GridDimension);
         }
 
         private void Update()
         {
             throw new System.NotImplementedException();
-        }
-        
-        
+        }        
     }
 }
