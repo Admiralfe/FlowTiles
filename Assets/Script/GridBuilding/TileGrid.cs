@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Script.FlowTileUtils;
+using UnityEngine.XR.WSA.Persistence;
 
 public class TileGrid : IEnumerable<FlowTile>
 {
@@ -15,7 +16,7 @@ public class TileGrid : IEnumerable<FlowTile>
         public int RightFlux { get; }
         public int BottomFlux { get; }
         public int LeftFlux { get; }
-
+     
         public FlowTile(int topFluxIn, int rightFluxIn, int bottomFluxIn, int leftFluxIn)
         {
             TopFlux = topFluxIn;
@@ -52,6 +53,11 @@ public class TileGrid : IEnumerable<FlowTile>
     public FlowTile GetFlowTile(int rowIndex, int colIndex)
     {
         return TileSet[rowIndex, colIndex];
+    }
+
+    public static int[] getRowColIndexes(float x, float y)
+    {
+        return null;
     }
 
     public IEnumerator<FlowTile> GetEnumerator()

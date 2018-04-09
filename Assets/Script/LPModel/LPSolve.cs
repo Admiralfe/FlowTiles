@@ -102,25 +102,29 @@ namespace Script.LPModel
                         lpsolve.set_bounds(LpModel, tileEdges[(int) Direction.Top],
                             currentTileGrid.GetFlowTile(row, column).Flux.topEdge,
                             currentTileGrid.GetFlowTile(row, column).Flux.topEdge);
-
+                        
+                        //Sets a flag that the edge flux has been set so that the value isn't overridden later.
                         edgeSetFlag[tileEdges[(int) Direction.Top]] = true;
 
                         lpsolve.set_bounds(LpModel, tileEdges[(int) Direction.Right],
                             currentTileGrid.GetFlowTile(row, column).Flux.rightEdge,
                             currentTileGrid.GetFlowTile(row, column).Flux.rightEdge);
-
+                        
+                        //Sets a flag that the edge flux has been set so that the value isn't overridden later.
                         edgeSetFlag[tileEdges[(int) Direction.Right]] = true;
 
                         lpsolve.set_bounds(LpModel, tileEdges[(int) Direction.Bottom],
                             currentTileGrid.GetFlowTile(row, column).Flux.bottomEdge,
                             currentTileGrid.GetFlowTile(row, column).Flux.bottomEdge);
-
+                        
+                        //Sets a flag that the edge flux has been set so that the value isn't overridden later.
                         edgeSetFlag[tileEdges[(int) Direction.Bottom]] = true;
 
                         lpsolve.set_bounds(LpModel, tileEdges[(int) Direction.Left],
                             currentTileGrid.GetFlowTile(row, column).Flux.leftEdge,
                             currentTileGrid.GetFlowTile(row, column).Flux.leftEdge);
-
+                        
+                        //Sets a flag that the edge flux has been set so that the value isn't overridden later.
                         edgeSetFlag[tileEdges[(int) Direction.Left]] = true;
                     }
                 }
