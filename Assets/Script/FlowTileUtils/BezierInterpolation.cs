@@ -9,7 +9,7 @@ namespace Script.FlowTileUtils
 {
     public class BezierInterpolation
     {
-        public static Vector2[] Bezier2D(Vector2[] controlPoints, int noOfInterpolationPoints, int steps = 1000)
+        public static Vector2[] Bezier2D(List<Vector2> controlPoints, int noOfInterpolationPoints, int steps = 1000)
         {
             int n = noOfInterpolationPoints;
             float xStep = (controlPoints[3].x - controlPoints[0].x) / (n - 1);
@@ -48,6 +48,21 @@ namespace Script.FlowTileUtils
 
             return InterpolatedData;
         }
+        
+        private static int usefulMap(int x, int n)
+        {
+            int y = 0;
+            switch (x)
+            {
+                case 0: y = 0; break;
+                case 1: y = 1; break;
+                case 2: y = -2; break;
+                case 3: y = -3; break;
+                default: y = 0; break;
+            }
+
+            return (y + n) % n;
+        }
 
         public static Vector3[,] Bezier3D(Vector3[,] controlPoints, int noOfInterpolationPoints, int steps = 1000)
         {
@@ -69,7 +84,7 @@ namespace Script.FlowTileUtils
             }
             
             int n = noOfInterpolationPoints;
-            Vector3[,] InterpolatedData = new Vector3[n, n];           
+            Vector3[,] InterpolatedData = new Vector3[n, n];            
             
             for (int i = 0; i < 4; i++)
             {

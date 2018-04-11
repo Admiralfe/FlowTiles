@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Script.FlowTileUtils;
@@ -55,9 +56,12 @@ public class TileGrid : IEnumerable<FlowTile>
         return TileSet[rowIndex, colIndex];
     }
 
-    public static int[] getRowColIndexes(float x, float y)
+    public int[] GetRowColIndexes(float x, float y)
     {
-        return null;
+        int rowIndex = (int) Math.Floor(y * Dimension);
+        int colIndex = (int) Math.Floor(x * Dimension);
+
+        return new int[] {rowIndex, colIndex};
     }
 
     public IEnumerator<FlowTile> GetEnumerator()

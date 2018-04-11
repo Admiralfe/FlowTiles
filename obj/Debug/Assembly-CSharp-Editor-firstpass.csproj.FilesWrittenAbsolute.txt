@@ -113,3 +113,7 @@
 /home/felix/FlowTiles/Temp/bin/Debug/Unity.IvyParser.dll.mdb
 /home/felix/FlowTiles/Temp/bin/Debug/UnityEditor.iOS.Extensions.Xcode.dll
 /home/felix/FlowTiles/Temp/bin/Debug/UnityEditor.iOS.Extensions.Xcode.xml
+/home/felix/FlowTiles/obj/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/home/felix/FlowTiles/Temp/bin/Debug/Mono.Security.dll
+/home/felix/FlowTiles/Temp/bin/Debug/Boo.Lang.PatternMatching.dll
+/home/felix/FlowTiles/Temp/bin/Debug/Boo.Lang.Useful.dll

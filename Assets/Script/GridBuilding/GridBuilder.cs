@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Script.FlowTileUtils;
 using Script.LPModel;
+using UnityEngine;
 using UnityEngine.WSA;
+using Random = System.Random;
 
 namespace Script.GridBuilding
 {
@@ -155,12 +156,20 @@ namespace Script.GridBuilding
                             flux.bottomEdge = k;
                             flux.leftEdge = l;
 
-                            currentValidTiles.Add(new FlowTile(innerTileGridDimension, flux, new CornerVelocities()));
+                            currentValidTiles.Add(new FlowTile(innerTileGridDimension, flux,
+                                new CornerVelocities
+                                {
+                                    topLeft = Vector2.zero,
+                                    bottomLeft = Vector2.zero,
+                                    topRight = Vector2.zero,
+                                    bottomRight = Vector2.zero,
+                                }));
                         }
                     }
                 }
             }
-
+            
+            /*
             foreach (FlowTile tile in currentValidTiles)
             {
                 Console.WriteLine("Top: " + tile.Flux.topEdge);
@@ -168,13 +177,14 @@ namespace Script.GridBuilding
                 Console.WriteLine("Bottom: " + tile.Flux.bottomEdge);
                 Console.WriteLine("Left: " + tile.Flux.leftEdge + "\n");
             }
+            */
 
-            Console.WriteLine("number of tiles: " + currentValidTiles.Count);
+            //WriteLine("number of tiles: " + currentValidTiles.Count);
 
             List<FlowTile> newValidTiles =
                 LPSolve.FilterValidTiles(currentValidTiles, rowNumber, colNumber, gridDimension);
 
-            Console.WriteLine("final number of tiles: " + newValidTiles.Count);
+            //Console.WriteLine("final number of tiles: " + newValidTiles.Count);
             
             return newValidTiles;
         }

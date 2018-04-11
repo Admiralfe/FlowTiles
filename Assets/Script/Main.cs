@@ -17,6 +17,14 @@ public class Main : MonoBehaviour
     public float BackGroundScale;
 	public int TileGridDimension;
 	// Use this for initialization
+
+	public TileGrid tileGrid;
+
+	public float getTileWidth()
+	{
+		return BackgroundScale / (float) TileGridDimension;
+	}
+	
 	private void Start ()
 	{
         //Makes the camera square.
@@ -32,7 +40,8 @@ public class Main : MonoBehaviour
 
 		for (int i = 0; i < numberOfAgents; i++)
 		{
-			Instantiate(Point, new Vector3(Random.Range(0, 1), Random.Range(0, 1), 0), Quaternion.identity);
+			Instantiate(Point, new Vector3(Random.Range(0, BackgroundScale), Random.Range(0, BackgroundScale), 0),
+				Quaternion.identity);
 		}
 	}
 }
