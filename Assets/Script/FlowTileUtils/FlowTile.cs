@@ -3,7 +3,8 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Script.FlowTileUtils
-{     public class FlowTile
+{
+    public class FlowTile
     {  
         public Flux Flux;
         public CornerVelocities CornerVelocities;
