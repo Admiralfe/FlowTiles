@@ -3,12 +3,13 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Script.FlowTileUtils
-{
+{   
     public class FlowTile
     {  
         public Flux Flux;
         public CornerVelocities CornerVelocities;
         public int GridSize;
+        private int StreamFunctionGridSize;
         
         /// <summary>
         /// The velocity grid is GridSize * GridSize large and holds a velocity in every point. The index x=0, y=0
@@ -32,59 +33,54 @@ namespace Script.FlowTileUtils
         public FlowTile(int gridSize, Flux flux, CornerVelocities cornerVelocities)
         {
             GridSize = gridSize;
-            StreamFunctionGrid = new float[gridSize+1, gridSize+1];
+            StreamFunctionGridSize = GridSize + 1;
+            StreamFunctionGrid = new float[StreamFunctionGridSize, StreamFunctionGridSize];
             Flux = flux;
             CornerVelocities = cornerVelocities;
             VelocityGrid = new Vector2[GridSize, GridSize];
+            ControlPoints = new Vector3[4,4];
             GenerateStreamFunctionGrid();
             GenerateVelocityGrid();
-            ControlPoints = new Vector3[4,4];
         }
         
 
 
         private void GenerateStreamFunctionGrid()
         {
-            //Size of the StreamFunctionGrid
-            int n = GridSize + 1;
+            //Biggest index in VelocityGrid
+            int max = GridSize - 1;
             SetControlPoint(x : -0.5, y : -0.5 , value: 0.0);
-            SetControlPoint(x : n + 0.5, y : -0.5, value: Flux.bottomEdge);
-            SetControlPoint(x : -0.5, y : n + 0.5, value: -Flux.leftEdge);
-            SetControlPoint(x : n + 0.5, y : n + 0.5 , 
-                              value: GetControlPoint(x: -0.5, y: n + 0.5).z + Flux.topEdge);
+            SetControlPoint(x : max + 0.5, y : -0.5, value: Flux.BottomEdge);
+            SetControlPoint(x : -0.5, y : max + 0.5, value: -Flux.LeftEdge);
+            SetControlPoint(x : max + 0.5, y : max + 0.5 , 
+                              value: GetControlPoint(x: -0.5, y: max + 0.5).z + Flux.TopEdge);
 
             //set points around the corners
             //bottom left
-            SetControlPoint(x: -0.5, y: 0.5, value: GetControlPoint(x: -0.5, y: -0.5).z + CornerVelocities.bottomLeft.x);
-            SetControlPoint(x: 0.5, y: -0.5, value: GetControlPoint(x: -0.5, y: -0.5).z - CornerVelocities.bottomLeft.y);
-            SetControlPoint(x: 0.5, y: 0.5, value: GetControlPoint(x: 0.5, y: -0.5).z + CornerVelocities.bottomLeft.x);
+            SetControlPoint(x: -0.5, y: 0.5, value: GetControlPoint(x: -0.5, y: -0.5).z + CornerVelocities.BottomLeft.x);
+            SetControlPoint(x: 0.5, y: -0.5, value: GetControlPoint(x: -0.5, y: -0.5).z - CornerVelocities.BottomLeft.y);
+            SetControlPoint(x: 0.5, y: 0.5, value: GetControlPoint(x: 0.5, y: -0.5).z + CornerVelocities.BottomLeft.x);
 
             //top left
-            SetControlPoint(x: -0.5, y: n - 0.5, value: GetControlPoint(x: -0.5, y: n + 0.5).z - CornerVelocities.topLeft.x);
-            SetControlPoint(x: 0.5, y: n + 0.5, value: GetControlPoint(x: -0.5, y: n + 0.5).z - CornerVelocities.topLeft.y);
-            SetControlPoint(x: 0.5, y: n - 0.5, value: GetControlPoint(x: 0.5, y: n + 0.5).z - CornerVelocities.topLeft.x);
+            SetControlPoint(x: -0.5, y: max - 0.5, value: GetControlPoint(x: -0.5, y: max + 0.5).z - CornerVelocities.TopLeft.x);
+            SetControlPoint(x: 0.5, y: max + 0.5, value: GetControlPoint(x: -0.5, y: max + 0.5).z - CornerVelocities.TopLeft.y);
+            SetControlPoint(x: 0.5, y: max - 0.5, value: GetControlPoint(x: 0.5, y: max + 0.5).z - CornerVelocities.TopLeft.x);
 
             //top right
-            SetControlPoint(x: n + 0.5, y: n - 0.5, value: GetControlPoint(x: n + 0.5, y: n + 0.5).z + CornerVelocities.topRight.x);
-            SetControlPoint(x: n - 0.5, y: n + 0.5, value: GetControlPoint(x: n + 0.5, y: n + 0.5).z - CornerVelocities.topRight.y);
-            SetControlPoint(x: n- 0.5, y: n - 0.5, value: GetControlPoint(x: n - 0.5, y: n + 0.5).z + CornerVelocities.topRight.x);
+            SetControlPoint(x: max + 0.5, y: max - 0.5, value: GetControlPoint(x: max + 0.5, y: max + 0.5).z + CornerVelocities.TopRight.x);
+            SetControlPoint(x: max - 0.5, y: max + 0.5, value: GetControlPoint(x: max + 0.5, y: max + 0.5).z - CornerVelocities.TopRight.y);
+            SetControlPoint(x: max - 0.5, y: max - 0.5, value: GetControlPoint(x: max - 0.5, y: max + 0.5).z + CornerVelocities.TopRight.x);
 
             //bottom right
-            SetControlPoint(x: n + 0.5, y: 0.5, value: GetControlPoint(x: n + 0.5, y: -0.5).z + CornerVelocities.bottomRight.x);
-            SetControlPoint(x: n - 0.5, y: -0.5, value: GetControlPoint(x: n + 0.5, y: 0.5).z - CornerVelocities.bottomRight.y);
-            SetControlPoint(x: n - 0.5, y: 0.5, value: GetControlPoint(x: n - 0.5, y: -0.5).z + CornerVelocities.bottomRight.x);
+            SetControlPoint(x: max + 0.5, y: 0.5, value: GetControlPoint(x: max + 0.5, y: -0.5).z + CornerVelocities.BottomRight.x);
+            SetControlPoint(x: max - 0.5, y: -0.5, value: GetControlPoint(x: max + 0.5, y: 0.5).z - CornerVelocities.BottomRight.y);
+            SetControlPoint(x: max - 0.5, y: 0.5, value: GetControlPoint(x: max - 0.5, y: -0.5).z + CornerVelocities.BottomRight.x);
 
-            var streamVector3s = BezierInterpolation.Bezier3D(ControlPoints, n);
+            Vector3[,] streamVector3s = BezierInterpolation.Bezier3D(ControlPoints, StreamFunctionGridSize);
             foreach (var streamVector in streamVector3s)
             {
                 SetStreamFunction(streamVector);
             }
-            {
-                
-            }
-
-
-
         }
 
         private void GenerateVelocityGrid()
@@ -97,7 +93,17 @@ namespace Script.FlowTileUtils
                 }
             }   
         }
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x">Between 0 and 1</param>
+        /// <param name="y">Between 0 and 1</param>
+        /// <returns></returns>
+        public Vector2 Velocity(float x, float y)
+        {
+            return Velocity((int) Math.Floor(x * (GridSize + 1)), (int) Math.Floor(y * (GridSize + 1)));
+        }
 
         public Vector2 Velocity(int x, int y)
         {
@@ -112,19 +118,18 @@ namespace Script.FlowTileUtils
         /// <param name="value"></param>
         void SetControlPoint(double x, double y, double value)
         {
-            int n = GridSize + 1;
+            int n = StreamFunctionGridSize;
             int i = CoordinateToIndex(y);
             int j = CoordinateToIndex(x);
-            if (i != 0 || i != 1)
+            if (i != 0 && i != 1)
             {
                 i = i - n + 4;
             }
 
-            if (j != 0 || j != 1)
+            if (j != 0 && j != 1)
             {
-                j = i - n + 4;
+                j = j - n + 4;
             }
-
             ControlPoints[i, j] = new Vector3((float) x, (float)y, (float)value);
         }
         
@@ -137,27 +142,48 @@ namespace Script.FlowTileUtils
         /// <returns></returns>
         Vector3 GetControlPoint(double x, double y)
         {
-            int n = GridSize + 1;
+            int n = StreamFunctionGridSize;
             int i = CoordinateToIndex(y);
             int j = CoordinateToIndex(x);
-            if (i != 0 || i != 1)
+            if (i != 0 && i != 1)
             {
                 i = i - n + 4;
             }
 
-            if (j != 0 || j != 1)
+            if (j != 0 && j != 1)
             {
-                j = i - n + 4;
+                j = j - n + 4;
             }
-
             return ControlPoints[i, j];
         }
         
         private Vector2 CalculateVeloctiy(int x, int y)
         {
+            int n = GridSize;
+            if (x == -0.5 && y == -0.5)
+            {
+                return CornerVelocities.BottomLeft;
+            }
+
+            if (x == 0 && y == n + 0.5)
+            {
+                return CornerVelocities.TopLeft;
+            }
+
+            if (x == n + 0.5 && y == -0.5)
+            {
+                return CornerVelocities.BottomRight;
+            }
+
+            if (x == n + 0.5 && y == n + 0.5)
+            {
+                return CornerVelocities.TopRight;
+            }
             Vector2 velocity = new Vector2 ();
-            velocity.x = StreamFunction(x, y - 0.5) - StreamFunction(x, y + 0.5);
-            velocity.y = StreamFunction(x + 0.5, y) - StreamFunction(x - 0.5, y);
+            velocity.x = (StreamFunction(x - 0.5, y - 0.5) + StreamFunction(x + 0.5, y - 0.5))/2 
+                         - (StreamFunction(x - 0.5, y + 0.5) + StreamFunction(x + 0.5, y + 0.5))/2;
+            velocity.y = (StreamFunction(x + 0.5, y + 0.5) + StreamFunction(x + 0.5, y - 0.5))/2 
+                         - (StreamFunction(x - 0.5, y + 0.5) + StreamFunction(x - 0.5, y - 0.5))/2;
             return velocity;
         }
         
@@ -182,7 +208,7 @@ namespace Script.FlowTileUtils
         /// <returns></returns>
         private Vector3 StreamFunctionVector(double x, double y)
         {
-            return new Vector3((float) x, (float) y, StreamFunction(x, y));
+            return new Vector3((float)x, (float)y, StreamFunction(x, y));
         }
 
         private void SetStreamFunction(Vector3 xys)
@@ -199,7 +225,7 @@ namespace Script.FlowTileUtils
         /// <param name="value">The value the set the StreamFunction to</param>
         private void SetStreamFunction(float x, float y, float value)
         {
-            StreamFunctionGrid[Convert.ToInt32(y + 0.5), Convert.ToInt32(x + 0.5)] = value;
+            StreamFunctionGrid[CoordinateToIndex(y), CoordinateToIndex(x)] = value;
         }
         
         /// <summary>
@@ -211,7 +237,7 @@ namespace Script.FlowTileUtils
         /// <exception cref="ArgumentException"></exception>
         private int CoordinateToIndex(double coordinate)
         {
-            if ((coordinate + 0.5) % 1.0 > 0.05)
+            if ((coordinate + 0.5) % 1.0 > 0.05 && (coordinate + 0.5) % 1.0 < 0.95)
             {
                 throw new ArgumentException();
             }
@@ -219,19 +245,52 @@ namespace Script.FlowTileUtils
             return Convert.ToInt32(coordinate + 0.5);
         }
     }
+    
     public struct Flux
     {
-        public int leftEdge;
-        public int rightEdge;
-        public int topEdge;
-        public int bottomEdge;
-    };
+        public int LeftEdge;
+        public int RightEdge;
+        public int TopEdge;
+        public int BottomEdge;
+        
+        public Flux(int a)
+        {
+            LeftEdge = 0;
+            RightEdge = 0;
+            TopEdge = 0;
+            BottomEdge = 0;
+        }
+
+        public Flux(int leftEdge, int rightEdge, int topEdge, int bottomEdge)
+        {
+            LeftEdge = leftEdge;
+            RightEdge = rightEdge;
+            TopEdge = rightEdge;
+            BottomEdge = bottomEdge;
+        }
+    }
 
     public struct CornerVelocities
     {
-        public Vector2 topLeft;
-        public Vector2 topRight;
-        public Vector2 bottomLeft;
-        public Vector2 bottomRight;
-    };
+        public Vector2 TopLeft;
+        public Vector2 TopRight;
+        public Vector2 BottomLeft;
+        public Vector2 BottomRight;
+        
+        public CornerVelocities(int a)
+        {    
+            TopLeft = new Vector2(0, 0);
+            TopRight = new Vector2(0, 0);
+            BottomLeft = new Vector2(0, 0);
+            BottomRight = new Vector2(0, 0);
+        }
+
+        public CornerVelocities(Vector2 topLeft, Vector2 topRight, Vector2 bottomLeft, Vector2 bottomRight)
+        {
+            TopLeft = topLeft;
+            TopRight = topRight;
+            BottomLeft = bottomLeft;
+            BottomRight = bottomRight;
+        }
+    }
 }

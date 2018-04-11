@@ -3,7 +3,8 @@ using Script.FlowTileUtils;
 using Script.LPModel;
 
 namespace Script.GridBuilding
-{
+{   
+    /*
     public class GridBuilderUI : MonoBehaviour
     {
         public int MinXFlux;
@@ -18,7 +19,7 @@ namespace Script.GridBuilding
 
         private void Start()
         {
-            gridBuilder = new GridBuilder(MinXFlux, MaxXFlux, MinYFlux, MaxYFlux, GridDimension);
+            gridBuilder = new GridBuilder(MinXFlux, MaxXFlux, MinYFlux, MaxYFlux, GridDimension, 0);
         }
 
         private void Update()
@@ -26,4 +27,5 @@ namespace Script.GridBuilding
             throw new System.NotImplementedException();
         }        
     }
+    */
 }

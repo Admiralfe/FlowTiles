@@ -24,7 +24,7 @@ namespace Script.GridBuilding
 
         public int innerTileGridDimension;
 
-        public GridBuilder(int minXFluxIn, int maxXFluxIn, int minYFluxIn, int maxYFluxIn, int gridDimensionIn)
+        public GridBuilder(int minXFluxIn, int maxXFluxIn, int minYFluxIn, int maxYFluxIn, int gridDimensionIn, int innerTileGridDimensionIn)
         {
             minXFlux = minXFluxIn;
             maxXFlux = maxXFluxIn;
@@ -32,9 +32,11 @@ namespace Script.GridBuilding
             maxYFlux = maxYFluxIn;
             gridDimension = gridDimensionIn;
 
+            innerTileGridDimension = innerTileGridDimensionIn;
+
             tileGrid = new TileGrid(gridDimension);
             
-            LPSolve.BuildInitialModel(minXFlux, maxXFlux, minYFlux, maxYFlux, tileGrid);
+            //LPSolve.BuildInitialModel(minXFlux, maxXFlux, minYFlux, maxYFlux, tileGrid);
         }
 
         public void AddTile(int rowIndex, int colIndex, FlowTile flowTile)
@@ -57,7 +59,7 @@ namespace Script.GridBuilding
             {
                 for (int col = 0; col < gridDimension; col++)
                 {
-                    //LPSolve.BuildInitialModel(minXFlux, maxXFlux, minYFlux, maxYFlux, tileGrid);
+                    LPSolve.BuildInitialModel(minXFlux, maxXFlux, minYFlux, maxYFlux, tileGrid);
                     List<FlowTile> validTiles = ValidTiles(row, col);
                     FlowTile newTile = validTiles[RNG.Next(0, validTiles.Count - 1)];
                     /*
@@ -151,18 +153,18 @@ namespace Script.GridBuilding
                         for (int l = validLeftFluxRange[0]; l <= validLeftFluxRange[1]; l++)
                         {
                             Flux flux = new Flux();
-                            flux.topEdge = i;
-                            flux.rightEdge = j;
-                            flux.bottomEdge = k;
-                            flux.leftEdge = l;
+                            flux.TopEdge = i;
+                            flux.RightEdge = j;
+                            flux.BottomEdge = k;
+                            flux.LeftEdge = l;
 
                             currentValidTiles.Add(new FlowTile(innerTileGridDimension, flux,
                                 new CornerVelocities
                                 {
-                                    topLeft = Vector2.zero,
-                                    bottomLeft = Vector2.zero,
-                                    topRight = Vector2.zero,
-                                    bottomRight = Vector2.zero,
+                                    TopLeft = Vector2.zero,
+                                    BottomLeft = Vector2.zero,
+                                    TopRight = Vector2.zero,
+                                    BottomRight = Vector2.zero,
                                 }));
                         }
                     }
