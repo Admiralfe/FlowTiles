@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Numerics;
 using System.Runtime.CompilerServices;
-using FlowTiles;
+using UnityEngine;
 
-namespace FlowTilesUtils
-{     public class FlowTile
+namespace Script.FlowTileUtils
+{
+    public class FlowTile
     {  
         public Flux Flux;
         public CornerVelocities CornerVelocities;
@@ -51,28 +51,28 @@ namespace FlowTilesUtils
             SetControlPoint(x : n + 0.5, y : -0.5, value: Flux.bottomEdge);
             SetControlPoint(x : -0.5, y : n + 0.5, value: -Flux.leftEdge);
             SetControlPoint(x : n + 0.5, y : n + 0.5 , 
-                              value: GetControlPoint(x: -0.5, y: n + 0.5).Z + Flux.topEdge);
+                              value: GetControlPoint(x: -0.5, y: n + 0.5).z + Flux.topEdge);
 
             //set points around the corners
             //bottom left
-            SetControlPoint(x: -0.5, y: 0.5, value: GetControlPoint(x: -0.5, y: -0.5).Z + CornerVelocities.bottomLeft.X);
-            SetControlPoint(x: 0.5, y: -0.5, value: GetControlPoint(x: -0.5, y: -0.5).Z - CornerVelocities.bottomLeft.Y);
-            SetControlPoint(x: 0.5, y: 0.5, value: GetControlPoint(x: 0.5, y: -0.5).Z + CornerVelocities.bottomLeft.X);
+            SetControlPoint(x: -0.5, y: 0.5, value: GetControlPoint(x: -0.5, y: -0.5).z + CornerVelocities.bottomLeft.x);
+            SetControlPoint(x: 0.5, y: -0.5, value: GetControlPoint(x: -0.5, y: -0.5).z - CornerVelocities.bottomLeft.y);
+            SetControlPoint(x: 0.5, y: 0.5, value: GetControlPoint(x: 0.5, y: -0.5).z + CornerVelocities.bottomLeft.x);
 
             //top left
-            SetControlPoint(x: -0.5, y: n - 0.5, value: GetControlPoint(x: -0.5, y: n + 0.5).Z - CornerVelocities.topLeft.X);
-            SetControlPoint(x: 0.5, y: n + 0.5, value: GetControlPoint(x: -0.5, y: n + 0.5).Z - CornerVelocities.topLeft.Y);
-            SetControlPoint(x: 0.5, y: n - 0.5, value: GetControlPoint(x: 0.5, y: n + 0.5).Z - CornerVelocities.topLeft.X);
+            SetControlPoint(x: -0.5, y: n - 0.5, value: GetControlPoint(x: -0.5, y: n + 0.5).z - CornerVelocities.topLeft.x);
+            SetControlPoint(x: 0.5, y: n + 0.5, value: GetControlPoint(x: -0.5, y: n + 0.5).z - CornerVelocities.topLeft.y);
+            SetControlPoint(x: 0.5, y: n - 0.5, value: GetControlPoint(x: 0.5, y: n + 0.5).z - CornerVelocities.topLeft.x);
 
             //top right
-            SetControlPoint(x: n + 0.5, y: n - 0.5, value: GetControlPoint(x: n + 0.5, y: n + 0.5).Z + CornerVelocities.topRight.X);
-            SetControlPoint(x: n - 0.5, y: n + 0.5, value: GetControlPoint(x: n + 0.5, y: n + 0.5).Z - CornerVelocities.topRight.Y);
-            SetControlPoint(x: n- 0.5, y: n - 0.5, value: GetControlPoint(x: n - 0.5, y: n + 0.5).Z + CornerVelocities.topRight.X);
+            SetControlPoint(x: n + 0.5, y: n - 0.5, value: GetControlPoint(x: n + 0.5, y: n + 0.5).z + CornerVelocities.topRight.x);
+            SetControlPoint(x: n - 0.5, y: n + 0.5, value: GetControlPoint(x: n + 0.5, y: n + 0.5).z - CornerVelocities.topRight.y);
+            SetControlPoint(x: n- 0.5, y: n - 0.5, value: GetControlPoint(x: n - 0.5, y: n + 0.5).z + CornerVelocities.topRight.x);
 
             //bottom right
-            SetControlPoint(x: n + 0.5, y: 0.5, value: GetControlPoint(x: n + 0.5, y: -0.5).Z + CornerVelocities.bottomRight.X);
-            SetControlPoint(x: n - 0.5, y: -0.5, value: GetControlPoint(x: n + 0.5, y: 0.5).Z - CornerVelocities.bottomRight.Y);
-            SetControlPoint(x: n - 0.5, y: 0.5, value: GetControlPoint(x: n - 0.5, y: -0.5).Z + CornerVelocities.bottomRight.X);
+            SetControlPoint(x: n + 0.5, y: 0.5, value: GetControlPoint(x: n + 0.5, y: -0.5).z + CornerVelocities.bottomRight.x);
+            SetControlPoint(x: n - 0.5, y: -0.5, value: GetControlPoint(x: n + 0.5, y: 0.5).z - CornerVelocities.bottomRight.y);
+            SetControlPoint(x: n - 0.5, y: 0.5, value: GetControlPoint(x: n - 0.5, y: -0.5).z + CornerVelocities.bottomRight.x);
 
             var streamVector3s = BezierInterpolation.Bezier3D(ControlPoints, n);
             foreach (var streamVector in streamVector3s)
@@ -156,8 +156,8 @@ namespace FlowTilesUtils
         private Vector2 CalculateVeloctiy(int x, int y)
         {
             Vector2 velocity = new Vector2 ();
-            velocity.X = StreamFunction(x, y - 0.5) - StreamFunction(x, y + 0.5);
-            velocity.Y = StreamFunction(x + 0.5, y) - StreamFunction(x - 0.5, y);
+            velocity.x = StreamFunction(x, y - 0.5) - StreamFunction(x, y + 0.5);
+            velocity.y = StreamFunction(x + 0.5, y) - StreamFunction(x - 0.5, y);
             return velocity;
         }
         
@@ -182,12 +182,12 @@ namespace FlowTilesUtils
         /// <returns></returns>
         private Vector3 StreamFunctionVector(double x, double y)
         {
-            return new Vector3(x, y, StreamFunction(x, y));
+            return new Vector3((float) x, (float) y, StreamFunction(x, y));
         }
 
         private void SetStreamFunction(Vector3 xys)
         {
-            SetStreamFunction(xys.X, xys.Y, xys.Z);
+            SetStreamFunction(xys.x, xys.y, xys.z);
         }
 
         /// <summary>

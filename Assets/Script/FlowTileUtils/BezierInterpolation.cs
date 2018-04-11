@@ -1,28 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 using System.Runtime.InteropServices;
-using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.Interpolation;
+using UnityEngine;
 
-namespace FlowTiles
+namespace Script.FlowTileUtils
 {
     public class BezierInterpolation
     {
         public static Vector2[] Bezier2D(Vector2[] controlPoints, int noOfInterpolationPoints, int steps = 1000)
         {
             int n = noOfInterpolationPoints;
-            float xStep = (controlPoints[3].X - controlPoints[0].X) / (n - 1);
+            float xStep = (controlPoints[3].x - controlPoints[0].x) / (n - 1);
             var InterpolatedData = new Vector2[n];
             InterpolatedData[0] = controlPoints[0];
             InterpolatedData[n - 1] = controlPoints[3];
             float t = 0.0F;
             for (int i = 1; i < n - 1; i++)
             {
-                float nextX = controlPoints[0].X + i * xStep;
+                float nextX = controlPoints[0].x + i * xStep;
                 Vector2 closestVector = new Vector2();
                 bool closestSet = false;
                 while (t < 1)
@@ -38,7 +35,7 @@ namespace FlowTiles
                         closestSet = true;
                         continue;
                     }
-                    if (Math.Abs(B.X - nextX) < Math.Abs(closestVector.X - nextX))
+                    if (Math.Abs(B.x - nextX) < Math.Abs(closestVector.x - nextX))
                     {
                         closestVector = B;
                         continue;
@@ -57,13 +54,13 @@ namespace FlowTiles
             //Check that all the points are in line, otherwise it is pretty hard to interpolate.
             for (int i = 0; i < 4; i++)
             {
-                if (controlPoints[i, 0].Y == controlPoints[i, 1].Y && 
-                    controlPoints[i, 1].Y == controlPoints[i, 2].Y && 
-                    controlPoints[i, 2].Y == controlPoints[i, 3].Y)
+                if (controlPoints[i, 0].y == controlPoints[i, 1].y && 
+                    controlPoints[i, 1].y == controlPoints[i, 2].y && 
+                    controlPoints[i, 2].y == controlPoints[i, 3].y)
                 {
-                    if (controlPoints[0, i].X == controlPoints[1, i].X &&
-                        controlPoints[1, i].X == controlPoints[2, i].X &&
-                        controlPoints[2, i].X == controlPoints[3, i].X)
+                    if (controlPoints[0, i].x == controlPoints[1, i].x &&
+                        controlPoints[1, i].x == controlPoints[2, i].x &&
+                        controlPoints[2, i].x == controlPoints[3, i].x)
                     {
                         continue;
                     }
@@ -72,35 +69,19 @@ namespace FlowTiles
             }
             
             int n = noOfInterpolationPoints;
-            Vector3[,] InterpolatedData = new Vector3[n, n];
-            
-            int usefulMap(int x)
-            {
-                int y = 0;
-                switch (x)
-                {
-                    case 0: y = 0; break;
-                    case 1: y = 1; break;
-                    case 2: y = -2; break;
-                    case 3: y = -3; break;
-                    default: y = 0; break;
-                }
-
-                return (y + n) % n;
-            }
-            
+            Vector3[,] InterpolatedData = new Vector3[n, n];           
             
             for (int i = 0; i < 4; i++)
             {
                 Vector2[] controlPointsRow = new Vector2[4];
                 for (int j = 0; j < 4; j++)
                 {
-                    controlPointsRow[j] = new Vector2(controlPoints[i,j].X, controlPoints[i,j].Z);   
+                    controlPointsRow[j] = new Vector2(controlPoints[i,j].x, controlPoints[i,j].z);   
                 }
                 Vector2[] dataRow = Bezier2D(controlPointsRow, n, steps);
                 for (int j = 0; j < n - 1; j++)
                 {
-                    InterpolatedData[usefulMap(i),j] = new Vector3(dataRow[j].X, controlPoints[i,1].Y, dataRow[j].Y);
+                    InterpolatedData[_usefulMap(i, n),j] = new Vector3(dataRow[j].x, controlPoints[i,1].y, dataRow[j].y);
                 }
             }
 
@@ -110,14 +91,14 @@ namespace FlowTiles
                 Vector2[] controlPointsCol = new Vector2[4];
                 for (int i = 0; i < 4; i++)
                 {
-                    controlPointsCol[i] = new Vector2(InterpolatedData[usefulMap(i), j].Y,
-                        InterpolatedData[usefulMap(i), j].Z);
+                    controlPointsCol[i] = new Vector2(InterpolatedData[_usefulMap(i, n), j].y,
+                        InterpolatedData[_usefulMap(i, n), j].z);
                 }
                 
                 Vector2[] dataCol = Bezier2D(controlPointsCol, n, steps);
                 for (int i = 0; i < n - 1; i++)
                 {
-                    InterpolatedData[i,j] = new Vector3(InterpolatedData[1,j].X, dataCol[i].X, dataCol[i].Y);
+                    InterpolatedData[i,j] = new Vector3(InterpolatedData[1,j].x, dataCol[i].x, dataCol[i].y);
                 }
             }
                 
@@ -130,32 +111,18 @@ namespace FlowTiles
             
             int n = noOfInterpolationPoints;
             Vector2[,] InterpolatedData = new Vector2[n, n];
-            int usefulMap(int x)
-            {
-                int y = 0;
-                switch (x)
-                {
-                        case 0: y = 0; break;
-                        case 1: y = 1; break;
-                        case 2: y = -2; break;
-                        case 3: y = -3; break;
-                        default: y = 0; break;
-                }
-
-                return (y + n) % n;
-            }
 
             for (int i = 0; i < 4; i++)
             {
                 Vector2[] controlPointsRow = new Vector2[4];
                 for (int j = 0; j < 4; j++)
                 {
-                    controlPointsRow.Append(controlPoints[i, j]);
+                    controlPointsRow[j] = controlPoints[i, j];
                 }
                 var dataRow = Bezier2D(controlPointsRow, n, steps);
                 for (int j = 0; j < n; j++)
                 {
-                    InterpolatedData[usefulMap(i), j] = dataRow[j];
+                    InterpolatedData[_usefulMap(i, n), j] = dataRow[j];
                 }
             }
 
@@ -164,7 +131,7 @@ namespace FlowTiles
                 Vector2[] controlPointsCol = new Vector2[4];
                 for (int i = 0; i < 4; i++)
                 {
-                    controlPointsCol.Append(InterpolatedData[usefulMap(i), j]);
+                    controlPointsCol[i] = InterpolatedData[_usefulMap(i, n), j];
                 }
                 var dataCol = Bezier2D(controlPointsCol, n, steps);
                 for (int i = 0; i < n; i++)
@@ -186,7 +153,7 @@ namespace FlowTiles
             {
                 foreach (var vector in data)
                 {
-                    file.WriteLine(vector.X + ", " + vector.Y);
+                    file.WriteLine(vector.x + ", " + vector.y);
                 }
             }
 
@@ -195,7 +162,7 @@ namespace FlowTiles
             {
                 foreach (var vector in ControlPoints)
                 {
-                    file.WriteLine(vector.X + ", " + vector.Y);
+                    file.WriteLine(vector.x + ", " + vector.y);
                 }
             }
         }
@@ -203,7 +170,7 @@ namespace FlowTiles
         public static void Test3D()
         {
             int n = 11;
-            Random rnd = new Random();
+            System.Random rnd = new System.Random();
             Vector3[,] ControlPoints = new Vector3[4,4];
             int[] xyInts = {0, 1, 9, 10};
             using (StreamWriter file = new StreamWriter("ControlPoints3d.csv"))
@@ -229,7 +196,7 @@ namespace FlowTiles
                     for (int j = 0; j < n - 1; j++)
                     {
                         var vec = data[i, j];
-                        file.WriteLine(vec.X + ", "+ vec.Y + ", " + vec.Z);
+                        file.WriteLine(vec.x + ", "+ vec.y + ", " + vec.z);
                     }
                 }
             }
@@ -238,6 +205,21 @@ namespace FlowTiles
                 
             }
 
+        }
+
+        private static int _usefulMap(int x, int n)
+        {
+            int y = 0;
+            switch (x)
+            {
+                case 0: y = 0; break;
+                case 1: y = 1; break;
+                case 2: y = -2; break;
+                case 3: y = -3; break;
+                default: y = 0; break;
+            }
+
+            return (y + n) % n;
         }
 
     }

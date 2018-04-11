@@ -9,21 +9,27 @@ public class Main : MonoBehaviour
 {
 
 	public GameObject Point;
-	public Camera MainCamera = Camera.main;
+
+    public TileGrid TileGrid;
 	
 	//Set this in Unity UI
 	public int numberOfAgents;
-
+    public float BackGroundScale;
 	public int TileGridDimension;
 	// Use this for initialization
 	private void Start ()
 	{
+        //Makes the camera square.
+        Camera.main.aspect = 1;
+
+        Camera.main.orthographicSize = BackGroundScale / 2f;
 		//Translate the camera so lower left corner has coordinates (0, 0)
 		Camera.main.transform.Translate(new Vector3(Camera.main.orthographicSize * Camera.main.aspect,
 			Camera.main.orthographicSize));
 		
 		GridBuilder gridBuilder = new GridBuilder(-4, 4, -4, 4, TileGridDimension);
-		TileGrid tileGrid = gridBuilder.BuildRandomTileGrid();
+		TileGrid = gridBuilder.BuildRandomTileGrid();
+
 		for (int i = 0; i < numberOfAgents; i++)
 		{
 			Instantiate(Point, new Vector3(Random.Range(0, 1), Random.Range(0, 1), 0), Quaternion.identity);
