@@ -97,3 +97,4 @@
 /home/felix/FlowTiles/Temp/bin/Debug/Unity.Cecil.Mdb.dll
 /home/felix/FlowTiles/Temp/bin/Debug/Unity.IvyParser.dll
 /home/felix/FlowTiles/Temp/bin/Debug/Unity.IvyParser.dll.mdb
+/home/felix/FlowTiles/obj/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs

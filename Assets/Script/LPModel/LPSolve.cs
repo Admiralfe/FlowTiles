@@ -19,8 +19,15 @@ namespace Script.LPModel
             Left
         }
 
-        /* Creates a linear programming model for solving a specific network flow problem.
-         */
+        /// <summary>
+        /// Creates a Linear Programming problem instance for creating divergence free flows using a tiling method.
+        /// The instance is stored in <see cref="LpModel"/>.
+        /// </summary>
+        /// <param name="minXFlux">Minimum flux in X direction as an integer</param>
+        /// <param name="maxXFlux">Maximum flux in X direction as an integer</param>
+        /// <param name="minYFlux">Minimum flux in Y direction as an integer</param>
+        /// <param name="maxYFlux">Maximum flux in Y direction as an integer</param>
+        /// <param name="currentTileGrid"></param>
         public static void BuildInitialModel(int minXFlux, int maxXFlux, int minYFlux, int maxYFlux,
             TileGrid currentTileGrid)
         {
@@ -132,7 +139,16 @@ namespace Script.LPModel
 
             lpsolve.set_verbose(LpModel, 0);
         }
-
+        
+        /// <summary>
+        /// Sets which edge in the tiling to maximize or minimize the flux for, given the LP-constraints specified
+        /// when creating the LP-model using BuildInitialModel. The LPmodel referred to is <see cref="LpModel"/>.
+        /// </summary>
+        /// <param name="row">Row index of the tile</param>
+        /// <param name="col">Column index of the tile</param>
+        /// <param name="direction">Direction the edge is facing in the tile</param>
+        /// <param name="gridDimension">Number of tiles in width and height the grid is.</param>
+        /// <param name="maximize">Flag for minimizing or maximizing</param>
         public static void SetEdgeToSolve(int row, int col, Direction direction, int gridDimension, bool maximize)
         {
             double[] rowVector = {1};
@@ -152,20 +168,28 @@ namespace Script.LPModel
 
             //lpsolve.set_simplextype(LpModel, lpsolve.lpsolve_simplextypes.SIMPLEX_PRIMAL_PRIMAL);
         }
-
+        
+        /// <summary>
+        /// Solves the LP-model in <see cref="LpModel"/>.
+        /// </summary>
+        /// <returns>The value of the solution</returns>
         public static int SolveModel()
         {
             lpsolve.solve(LpModel);
 
             return (int) lpsolve.get_objective(LpModel);
         }
-
+        
+        /// <summary>
+        /// Use this to free the memory allocated to the LP-problem instance when done with it.
+        /// </summary>
         public static void FreeModel()
         {
             lpsolve.delete_lp(LpModel);
         }
 
-        //Computes the 1d arrayindex for edge from sourceCell to destCell. Indexes of variables in lpsolve start at 1.
+        //Computes the 1d array index (counted from top left to bottom right)
+        //for edge from sourceCell to destCell. Indexes of variables in lpsolve start at 1.
         private static int GridToEdgeIndex(int sourceCell, int destCell, int gridDimension, bool isXDirection)
         {
             if (isXDirection)
@@ -237,7 +261,16 @@ namespace Script.LPModel
 
             return result;
         }
-
+        
+        /// <summary>
+        /// Filters valid tiles from the list by adding them one by one as constraints to the LPModel and checking
+        /// if a solution exists.
+        /// </summary>
+        /// <param name="currentValidTiles">Set of candidate valid tiles</param>
+        /// <param name="rowNumber">Which row the candidate tiles should be placed in</param>
+        /// <param name="colNumber">Which column the candidate tiles should be placed in</param>
+        /// <param name="gridDimension">Dimension of the grid tiling</param>
+        /// <returns></returns>
         public static List<FlowTile> FilterValidTiles(List<FlowTile> currentValidTiles,
             int rowNumber, int colNumber, int gridDimension)
         {

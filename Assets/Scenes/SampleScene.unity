@@ -141,7 +141,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Point: {fileID: 1431121913699012, guid: 076882dc820594961bc662d37c93ddcf, type: 2}
+  Background: {fileID: 1376070629835750, guid: 421dafc6b59c84a3d87733b37c377c4c, type: 2}
   numberOfAgents: 10
+  BackgroundScale: 10
+  TileGridDimension: 0
 --- !u!4 &481572471
 Transform:
   m_ObjectHideFlags: 0
@@ -149,7 +152,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 481572469}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.13290557, y: -0.24742842, z: 0.036781922}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -178,7 +181,7 @@ AudioListener:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 519420028}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
