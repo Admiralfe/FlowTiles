@@ -41,8 +41,9 @@ public class Main : MonoBehaviour
 
 		for (int i = 0; i < numberOfAgents; i++)
 		{
-			Instantiate(Point, new Vector3(Random.Range(0, BackGroundScale), Random.Range(0, BackGroundScale), 0),
+			GameObject p = Instantiate(Point, new Vector3(Random.Range(0, BackGroundScale), Random.Range(0, BackGroundScale), 0),
 				Quaternion.identity);
+			p.GetComponent<MovingPoint>().MainRef = this;
 		}
 	}
 }
