@@ -12,23 +12,31 @@ namespace Script.FlowTileUtils
         /// <param name="x"></param>
         /// <param name="n">Grid size</param>
         /// <returns></returns>
-        public static int ControlPointIndexToGridIndex(int x, int n)
-        {
-            int y;
-            switch (x)
-            {
-                case 0: y = 0; break;
-                case 1: y = 1; break;
-                case 2: y = -2; break;
-                case 3: y = -1; break;
-                default: y = 0; break;
-            }
+		public static int ControlPointIndexToGridIndex(int x, int n)
+		{
+			if (x < 0 || x > 3)
+			{
+				throw new ArgumentException("Control Point index must be 0, 1, 2 or 3");
+			}
+			int y;
+			switch (x)
+			{
+			case 0: y = 0; break;
+			case 1: y = 1; break;
+			case 2: y = -2; break;
+			case 3: y = -1; break;
+			default: y = 0; break;
+			}
 
-            return (y + n) % n;
-        }
+			return (y + n) % n;
+		}
         
         public static Vector2[] Bezier2D(Vector2[] controlPoints, int noOfInterpolationPoints, int steps = 1000)
         {
+			if (noOfInterpolationPoints <= 4)
+			{
+				throw new ArgumentException("The number of interpolation points must be at least five.");
+			}
             int n = noOfInterpolationPoints;
             float xStep = (controlPoints[3].x - controlPoints[0].x) / (n - 1);
             var InterpolatedData = new Vector2[n];
@@ -70,21 +78,22 @@ namespace Script.FlowTileUtils
         public static Vector3[,] Bezier3D(Vector3[,] controlPoints, int noOfInterpolationPoints, int steps = 1000)
         {
             //Check that all the points are in line, otherwise it is pretty hard to interpolate.
-            for (int i = 0; i < 4; i++)
-            {
-                if (controlPoints[i, 0].y == controlPoints[i, 1].y && 
-                    controlPoints[i, 1].y == controlPoints[i, 2].y && 
-                    controlPoints[i, 2].y == controlPoints[i, 3].y)
-                {
-                    if (controlPoints[0, i].x == controlPoints[1, i].x &&
-                        controlPoints[1, i].x == controlPoints[2, i].x &&
-                        controlPoints[2, i].x == controlPoints[3, i].x)
-                    {
-                        continue;
-                    }
-                }
-                throw new ArgumentException();
-            }
+			for (int i = 0; i < 4; i++)
+			{
+				if (!(controlPoints[i, 0].y == controlPoints[i, 1].y &&
+					controlPoints[i, 1].y == controlPoints[i, 2].y &&
+					controlPoints[i, 2].y == controlPoints[i, 3].y))
+				{
+					throw new ArgumentException("The y-coordinates of the ControlPoints must be the same along each row");
+				}
+
+				if (!(controlPoints[0, i].x == controlPoints[1, i].x &&
+					controlPoints[1, i].x == controlPoints[2, i].x &&
+					controlPoints[2, i].x == controlPoints[3, i].x))
+				{
+					throw new ArgumentException("The x-coordinates of the ControlPoints must be the same along each column");
+				}
+			}
             
             int n = noOfInterpolationPoints;
             Vector3[,] InterpolatedData = new Vector3[n, n];

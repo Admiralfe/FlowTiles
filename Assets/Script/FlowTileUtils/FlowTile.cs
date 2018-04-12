@@ -100,10 +100,37 @@ namespace Script.FlowTileUtils
         /// <param name="x">Between 0 and 1</param>
         /// <param name="y">Between 0 and 1</param>
         /// <returns></returns>
-        public Vector2 Velocity(float x, float y)
-        {
-            return Velocity((int) Math.Floor(x * (GridSize + 1)), (int) Math.Floor(y * (GridSize + 1)));
-        }
+		public Vector2 Velocity(float x, float y)
+		{
+			if (x < 0 || x > 1)
+			{
+				throw new ArgumentException("x-coordinate out of bounds");
+			}
+
+			if (y < 0 || y > 1)
+			{
+				throw new ArgumentException("y-coordinate out of bounds");
+			}
+
+			if (x > 0.99)
+			{
+				x = GridSize - 1;
+			}
+			else
+			{
+				x = (float)Math.Floor(x * GridSize);
+			}
+
+			if (y > 0.99)
+			{
+				y = GridSize - 1;
+			}
+			else
+			{
+				y = (float) Math.Floor(y * GridSize);
+			}
+			return Velocity((int) x, (int) y);
+		}
 
         public Vector2 Velocity(int x, int y)
         {
