@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -32,6 +33,10 @@ namespace Script.FlowTileUtils
 
         public FlowTile(int gridSize, Flux flux, CornerVelocities cornerVelocities)
         {
+            if (flux.LeftEdge + flux.BottomEdge != flux.RightEdge + flux.TopEdge)
+            {
+                throw new ArgumentException("The net flux in and out a flow tile must be zero");
+            }
             GridSize = gridSize;
             StreamFunctionGridSize = GridSize + 1;
             StreamFunctionGrid = new float[StreamFunctionGridSize, StreamFunctionGridSize];
@@ -271,6 +276,32 @@ namespace Script.FlowTileUtils
 
             return Convert.ToInt32(coordinate + 0.5);
         }
+        public void WriteToFile(String filename)
+        {
+            using (StreamWriter writer = new StreamWriter(filename))
+            {
+                for (int i = 0; i < GridSize; i++)
+                {
+                    String rowString = "";
+                    for (int j = 0; j < GridSize; j++)
+                    {
+                        try
+                        {
+                            var vel = Velocity(j, i);
+                            rowString += string.Format("{0:N2},{1:N2};",vel.x, vel.y);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                            Console.WriteLine(i);
+                            Console.WriteLine(j);
+                            throw;
+                        } 
+                    }
+                    writer.WriteLine(rowString);
+                }
+            }
+        }
     }
     
     public struct Flux
@@ -319,5 +350,9 @@ namespace Script.FlowTileUtils
             BottomLeft = bottomLeft;
             BottomRight = bottomRight;
         }
+        /// <summary>
+        /// Writes
+        /// </summary>
+        /// <param name="filename"></param>
     }
 }
