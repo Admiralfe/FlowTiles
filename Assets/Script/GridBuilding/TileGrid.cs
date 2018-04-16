@@ -43,6 +43,9 @@ public class TileGrid : IEnumerable<FlowTile>
 
     public bool HasTile(int rowIndex, int colIndex)
     {
+        if (rowIndex < 0 || colIndex < 0 || rowIndex > Dimension - 1 || colIndex > Dimension - 1)
+            return false;
+        
         return (TileSet[rowIndex, colIndex] != null);
     }
 

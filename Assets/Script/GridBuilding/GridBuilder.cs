@@ -9,7 +9,14 @@ using Random = System.Random;
 
 namespace Script.GridBuilding
 {
-
+    enum Corners
+    {
+        TopLeft,
+        TopRight,
+        BottomRight,
+        BottomLeft
+    }
+    
     public class GridBuilder
     {
 
@@ -17,6 +24,7 @@ namespace Script.GridBuilding
         private int maxXFlux;
         private int minYFlux;
         private int maxYFlux;
+        private List<Vector2> allowedVelocities = new List<Vector2>();
 
         private TileGrid tileGrid;
 
@@ -24,7 +32,8 @@ namespace Script.GridBuilding
 
         public int innerTileGridDimension;
 
-        public GridBuilder(int minXFluxIn, int maxXFluxIn, int minYFluxIn, int maxYFluxIn, int gridDimensionIn, int innerTileGridDimensionIn)
+        public GridBuilder(int minXFluxIn, int maxXFluxIn, int minYFluxIn, int maxYFluxIn, int gridDimensionIn,
+            int innerTileGridDimensionIn, Vector2[] allowedVelocitiesIn)
         {
             minXFlux = minXFluxIn;
             maxXFlux = maxXFluxIn;
@@ -33,7 +42,30 @@ namespace Script.GridBuilding
             gridDimension = gridDimensionIn;
 
             innerTileGridDimension = innerTileGridDimensionIn;
+            
+            foreach (Vector2 cornerVelocity in allowedVelocitiesIn)
+            {
+                allowedVelocities.Add(cornerVelocity);
+            }
 
+            tileGrid = new TileGrid(gridDimension);
+            
+            //LPSolve.BuildInitialModel(minXFlux, maxXFlux, minYFlux, maxYFlux, tileGrid);
+        }
+        
+        public GridBuilder(int minXFluxIn, int maxXFluxIn, int minYFluxIn, int maxYFluxIn, int gridDimensionIn,
+            int innerTileGridDimensionIn)
+        {
+            minXFlux = minXFluxIn;
+            maxXFlux = maxXFluxIn;
+            minYFlux = minYFluxIn;
+            maxYFlux = maxYFluxIn;
+            gridDimension = gridDimensionIn;
+
+            innerTileGridDimension = innerTileGridDimensionIn;
+            
+            allowedVelocities.Add(Vector2.zero);
+            
             tileGrid = new TileGrid(gridDimension);
             
             //LPSolve.BuildInitialModel(minXFlux, maxXFlux, minYFlux, maxYFlux, tileGrid);
@@ -78,6 +110,97 @@ namespace Script.GridBuilding
             return tileGrid;
         }
 
+        private Vector2[] velocityRestrictions(int rowNumber, int colNumber)
+        {
+            Vector2 allowedTopLeftVelocity;
+            Vector2 allowedBottomLeftVelocity;
+            Vector2 allowedTopRightVelocity;
+            Vector2 allowedBottomRightVelocity;
+            
+            bool topLeftRestricted = false;
+            bool bottomLeftRestricted = false;
+            bool topRightRestricted = false;
+            bool bottomRightRestricted = false;
+            
+            //Left tile
+            if(tileGrid.HasTile(rowNumber - 1, colNumber))
+            {
+                allowedTopLeftVelocity = tileGrid.GetFlowTile(rowNumber - 1, colNumber).CornerVelocities.TopRight;
+                allowedBottomLeftVelocity =
+                    tileGrid.GetFlowTile(rowNumber - 1, colNumber).CornerVelocities.BottomRight; 
+                
+                topLeftRestricted = true;
+                bottomLeftRestricted = true;
+            }
+            
+            //Top left tile
+            if (tileGrid.HasTile(rowNumber - 1, colNumber + 1))
+            {
+                
+                //Checks if velocity restriction has been set already, in that case we don't need to set it again, 
+                //since it will be the same in a valid tiling.
+                if (!topLeftRestricted)
+                {
+                    allowedTopLeftVelocity =
+                        tileGrid.GetFlowTile(rowNumber - 1, colNumber + 1).CornerVelocities.BottomRight;
+                    topLeftRestricted = true;
+                }
+            }
+            
+            //Bottom left tile
+            if (tileGrid.HasTile(rowNumber - 1, colNumber - 1))
+            {
+                if (!bottomLeftRestricted)
+                {
+                    allowedBottomLeftVelocity =
+                        tileGrid.GetFlowTile(rowNumber - 1, colNumber + 1).CornerVelocities.TopRight;
+                    bottomLeftRestricted = true;
+                }
+            }
+            
+            //Top tile
+            if (tileGrid.HasTile(rowNumber, colNumber + 1))
+            {
+                if (!topLeftRestricted)
+                {
+                    allowedTopLeftVelocity = 
+                        tileGrid.GetFlowTile(rowNumber, colNumber + 1).CornerVelocities.BottomLeft;
+                    topLeftRestricted = true;
+                }
+
+                if (!topRightRestricted)
+                {
+                    allowedTopRightVelocity = 
+                        tileGrid.GetFlowTile(rowNumber, colNumber + 1).CornerVelocities.BottomLeft;
+                    topRightRestricted = true;
+                }
+            }
+            
+            //Bottom Tile
+            if (tileGrid.HasTile(rowNumber, colNumber - 1))
+            {
+                if (!bottomLeftRestricted)
+                {
+                    allowedBottomLeftVelocity = 
+                        tileGrid.GetFlowTile(rowNumber, colNumber - 1).CornerVelocities.TopLeft;
+                    bottomLeftRestricted = true;
+                }
+
+                if (!bottomRightRestricted)
+                {
+                    allowedBottomRightVelocity =
+                        tileGrid.GetFlowTile(rowNumber, colNumber - 1).CornerVelocities.TopRight;
+                    bottomRightRestricted = true;
+                }
+            }
+            
+            //Left Tile
+            if (tileGrid.HasTile(rowNumber + 1, colNumber))
+            {
+                
+            }
+        }
+
         //Finds valid tiles in position rowNumber, colNumber and returns a list
         private List<FlowTile> ValidTiles(int rowNumber, int colNumber)
         {
@@ -85,7 +208,7 @@ namespace Script.GridBuilding
             int[] validBottomFluxRange = new int[2];
             int[] validLeftFluxRange = new int[2];
             int[] validRightFluxRange = new int[2];
-
+                        
             if (rowNumber == 0)
             {
                 validTopFluxRange[0] = 0;
@@ -183,12 +306,12 @@ namespace Script.GridBuilding
 
             //WriteLine("number of tiles: " + currentValidTiles.Count);
 
-            List<FlowTile> newValidTiles =
+            List<FlowTile> validTiles =
                 LPSolve.FilterValidTiles(currentValidTiles, rowNumber, colNumber, gridDimension);
 
             //Console.WriteLine("final number of tiles: " + newValidTiles.Count);
             
-            return newValidTiles;
+            return validTiles;
         }
     }
 
