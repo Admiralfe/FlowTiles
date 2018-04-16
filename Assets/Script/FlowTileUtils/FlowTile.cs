@@ -276,30 +276,36 @@ namespace Script.FlowTileUtils
 
             return Convert.ToInt32(coordinate + 0.5);
         }
+
+        public void WriteToFile(StreamWriter writer)
+        {
+            for (int i = 0; i < GridSize; i++)
+            {
+                String rowString = "";
+                for (int j = 0; j < GridSize; j++)
+                {
+                    try
+                    {
+                        var vel = Velocity(j, i);
+                        rowString += string.Format("{0:N2},{1:N2};",vel.x, vel.y);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        Console.WriteLine(i);
+                        Console.WriteLine(j);
+                        throw;
+                    } 
+                }
+                writer.WriteLine(rowString);
+            }
+        }
+        
         public void WriteToFile(String filename)
         {
             using (StreamWriter writer = new StreamWriter(filename))
             {
-                for (int i = 0; i < GridSize; i++)
-                {
-                    String rowString = "";
-                    for (int j = 0; j < GridSize; j++)
-                    {
-                        try
-                        {
-                            var vel = Velocity(j, i);
-                            rowString += string.Format("{0:N2},{1:N2};",vel.x, vel.y);
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e);
-                            Console.WriteLine(i);
-                            Console.WriteLine(j);
-                            throw;
-                        } 
-                    }
-                    writer.WriteLine(rowString);
-                }
+                WriteToFile(writer);
             }
         }
     }
