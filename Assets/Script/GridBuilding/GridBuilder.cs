@@ -274,16 +274,32 @@ namespace Script.GridBuilding
             return combinationList;
         }
         
-
-        //Finds valid tiles in position rowNumber, colNumber and returns a list
+        /// <summary>
+        /// Finds the valid flow tiles to be put in a position given by row and column indices.
+        /// The constraints are partially that edge fluxes should match and that the field needs to be divergence free.
+        /// </summary>
+        /// <param name="rowNumber">Row index in grid</param>
+        /// <param name="colNumber">Column index in grid</param>
+        /// <returns>List of valid tiles to put in that position</returns>
+        /// <exception cref="ArgumentException">
+        /// If there already is a tile in the given position this exception is thrown.
+        /// </exception>
         private List<FlowTile> ValidTiles(int rowNumber, int colNumber)
         {
+            if (tileGrid.HasTile(rowNumber, colNumber))
+            {
+                throw new ArgumentException("Tile already exists on that position");
+            }
+            
             int[] validTopFluxRange = new int[2];
             int[] validBottomFluxRange = new int[2];
             int[] validLeftFluxRange = new int[2];
             int[] validRightFluxRange = new int[2];
-
+            
+            //Finds the restrictions on corner velocities
             Vector2?[] restrictions = velocityRestrictions(rowNumber, colNumber);
+            //Finds all valid combinations of the allowed corner velocities.
+            List<CornerVelocities> allowedCornerVelocities = cornerVelocityCombinations(restrictions);
                         
             if (rowNumber == 0)
             {
@@ -351,20 +367,17 @@ namespace Script.GridBuilding
                     {
                         for (int l = validLeftFluxRange[0]; l <= validLeftFluxRange[1]; l++)
                         {
-                            Flux flux = new Flux();
-                            flux.TopEdge = i;
-                            flux.RightEdge = j;
-                            flux.BottomEdge = k;
-                            flux.LeftEdge = l;
+                            foreach (CornerVelocities cornerVelocities in allowedCornerVelocities)
+                            {
 
-                            currentValidTiles.Add(new FlowTile(innerTileGridDimension, flux,
-                                new CornerVelocities
-                                {
-                                    TopLeft = Vector2.zero,
-                                    BottomLeft = Vector2.zero,
-                                    TopRight = Vector2.zero,
-                                    BottomRight = Vector2.zero,
-                                }));
+                                Flux flux = new Flux();
+                                flux.TopEdge = i;
+                                flux.RightEdge = j;
+                                flux.BottomEdge = k;
+                                flux.LeftEdge = l;
+
+                                currentValidTiles.Add(new FlowTile(innerTileGridDimension, flux, cornerVelocities));
+                            }
                         }
                     }
                 }
@@ -389,6 +402,7 @@ namespace Script.GridBuilding
             
             return validTiles;
         }
+        
     }
 
 }
