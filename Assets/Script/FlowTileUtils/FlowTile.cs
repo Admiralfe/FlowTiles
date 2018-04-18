@@ -5,6 +5,14 @@ using UnityEngine;
 
 namespace Script.FlowTileUtils
 {   
+    public enum Corner
+    {
+        TopLeft,
+        TopRight,
+        BottomRight,
+        BottomLeft
+    }
+
     public class FlowTile
     {  
         public Flux Flux;
@@ -349,6 +357,46 @@ namespace Script.FlowTileUtils
             TopRight = topRight;
             BottomLeft = bottomLeft;
             BottomRight = bottomRight;
+        }
+
+        public Vector2 this[Corner c]
+        {
+            get
+            {
+                switch (c)
+                {
+                    case Corner.TopLeft:
+                        return TopLeft;
+                    case Corner.TopRight:
+                        return TopRight;
+                    case Corner.BottomRight:
+                        return BottomRight;
+                    case Corner.BottomLeft:
+                        return BottomLeft;
+                    default:
+                        throw new IndexOutOfRangeException("Corner index is out of bounds. " +
+                                                           "Make sure Corner enum has 4 values, one for each corner");
+                }
+            }
+
+            set
+            {
+                switch (c)
+                {
+                    case Corner.TopLeft:
+                        TopLeft = value;
+                        break;
+                    case Corner.TopRight:
+                        TopRight = value;
+                        break;
+                    case Corner.BottomRight:
+                        BottomRight = value;
+                        break;
+                    case Corner.BottomLeft:
+                        BottomLeft = value;
+                        break;
+                }
+            }
         }
         /// <summary>
         /// Writes
