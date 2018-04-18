@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Script.FlowTileUtils;
 using UnityEngine.XR.WSA.Persistence;
@@ -65,6 +66,20 @@ public class TileGrid : IEnumerable<FlowTile>
         int colIndex = (int) Math.Floor(x * Dimension);
 
         return new int[] {rowIndex, colIndex};
+    }
+
+    public void WriteToFile(string filename)
+    {
+        using (StreamWriter writer = new StreamWriter(filename))
+        {
+            for (int row = 0; row < Dimension; row++)
+            {
+                for (int col = 0; col < Dimension; col++)
+                {
+                    GetFlowTile(row,col).WriteToFile(writer);
+                }
+            }
+        }
     }
 
     public IEnumerator<FlowTile> GetEnumerator()
