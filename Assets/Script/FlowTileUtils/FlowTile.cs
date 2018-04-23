@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Xml;
 using UnityEngine;
 
 namespace Script.FlowTileUtils
@@ -316,8 +317,25 @@ namespace Script.FlowTileUtils
                 WriteToFile(writer);
             }
         }
-        
-        
+
+        public XmlElement ToXmlNode()
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            XmlElement element = xmlDoc.CreateElement("tile");
+            for (int y = 0; y < GridSize; y++)
+            {
+                for (int x = 0; x < GridSize; x++)
+                {
+                    XmlElement velocity = xmlDoc.CreateElement("velocity");
+                    velocity.SetAttribute("x", x.ToString());
+                    velocity.SetAttribute("y", y.ToString());
+                    velocity.SetAttribute("vx", Velocity(x, y).x.ToString());
+                    velocity.SetAttribute("vy", Velocity(x, y).y.ToString());
+                    element.AppendChild(velocity);
+                }
+            }
+            return element;
+        }
     }
     
     public struct Flux
