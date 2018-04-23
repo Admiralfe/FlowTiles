@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Xml;
 using Script.FlowTileUtils;
 using Script.LPModel;
 using UnityEngine;
@@ -73,6 +77,45 @@ namespace Script.GridBuilding
         public TileGrid GetTileGrid()
         {
             return tileGrid;
+        }
+
+        private void WriteTilesToXML(List<FlowTile> tiles, string filename)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            XmlElement root = xmlDoc.CreateElement("root");
+            foreach (var tile in tiles)
+            {
+                root.AppendChild(tile.ToXmlElement());
+            }
+            xmlDoc.Save(filename);
+        }
+
+        private FlowTile QueryUserForTile(int row, int col, List<FlowTile> validTiles)
+        {
+            string pathToScript = "/Users/Leo/src/Unity/FlowTiles/ui.py";
+            string path = Directory.GetCurrentDirectory();
+            string gridPath = path + "grid.xml";
+            string validTilesPath = path + "validtiles.xml";
+            tileGrid.WriteToXML(gridPath);
+            WriteTilesToXML(validTiles, validTilesPath);
+            
+            ProcessStartInfo start = new ProcessStartInfo();
+            start.FileName = "python3.5";
+            start.Arguments = string.Format("{0} {1} {2} {3} {4} {5}",
+                pathToScript, gridDimension, row, col, gridPath, validTilesPath);
+            start.UseShellExecute = false;
+            start.RedirectStandardOutput = true;
+            using (Process process = Process.Start(start))
+            {
+                using (StreamReader reader = process.StandardOutput)
+                {
+                    string result = reader.ReadToEnd();
+                    Console.WriteLine(result);
+                }
+            }
+            Console.WriteLine("Which tile do you want at row {0}, column {1}. Type a number:", row, col);
+            var num = Convert.ToInt32(Console.ReadLine());
+            return validTiles[num];
         }
         
         public TileGrid BuildRandomTileGrid()

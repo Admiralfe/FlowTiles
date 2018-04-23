@@ -318,7 +318,7 @@ namespace Script.FlowTileUtils
             }
         }
 
-        public XmlElement ToXmlNode()
+        public XmlElement ToXmlElement()
         {
             XmlDocument xmlDoc = new XmlDocument();
             XmlElement element = xmlDoc.CreateElement("tile");

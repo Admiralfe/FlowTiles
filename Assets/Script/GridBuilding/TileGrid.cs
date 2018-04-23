@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml;
+using System.Xml.Serialization;
 using Script.FlowTileUtils;
 using UnityEngine.XR.WSA.Persistence;
 
@@ -80,6 +82,26 @@ public class TileGrid : IEnumerable<FlowTile>
                 }
             }
         }
+    }
+
+    public void WriteToXML(string filename)
+    {
+        XmlDocument xmlDoc = new XmlDocument();
+        XmlElement root = xmlDoc.CreateElement("tilegrid");
+
+        for (int i = 0; i < Dimension; i++)
+        {
+            for (int j = 0; j < Dimension; j++)
+            {
+                var tile = GetFlowTile(i, j);
+                if(tile == null) continue;
+                XmlElement xmlTile = tile.ToXmlElement();
+                xmlTile.SetAttribute("row", i.ToString());
+                xmlTile.SetAttribute("col", j.ToString());
+                root.AppendChild(xmlTile);
+            }
+        }
+        xmlDoc.Save(filename);
     }
 
     public IEnumerator<FlowTile> GetEnumerator()
