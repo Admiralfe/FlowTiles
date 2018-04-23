@@ -327,8 +327,8 @@ namespace Script.FlowTileUtils
                 for (int x = 0; x < GridSize; x++)
                 {
                     XmlElement velocity = xmlDoc.CreateElement("velocity");
-                    velocity.SetAttribute("x", x.ToString());
-                    velocity.SetAttribute("y", y.ToString());
+                    velocity.SetAttribute("relX", x.ToString());
+                    velocity.SetAttribute("relY", y.ToString());
                     velocity.SetAttribute("vx", Velocity(x, y).x.ToString());
                     velocity.SetAttribute("vy", Velocity(x, y).y.ToString());
                     element.AppendChild(velocity);
