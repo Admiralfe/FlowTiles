@@ -42,10 +42,12 @@ namespace Script.FlowTileUtils
 
         public FlowTile(int gridSize, Flux flux, CornerVelocities cornerVelocities)
         {
+            /*
             if (flux.LeftEdge + flux.BottomEdge != flux.RightEdge + flux.TopEdge)
             {
                 throw new ArgumentException("The net flux in and out a flow tile must be zero");
             }
+            */
             GridSize = gridSize;
             StreamFunctionGridSize = GridSize + 1;
             StreamFunctionGrid = new float[StreamFunctionGridSize, StreamFunctionGridSize];
@@ -318,9 +320,8 @@ namespace Script.FlowTileUtils
             }
         }
 
-        public XmlElement ToXmlElement()
+        public XmlElement ToXmlElement(XmlDocument xmlDoc)
         {
-            XmlDocument xmlDoc = new XmlDocument();
             XmlElement element = xmlDoc.CreateElement("tile");
             for (int y = 0; y < GridSize; y++)
             {

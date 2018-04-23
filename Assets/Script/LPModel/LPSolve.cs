@@ -188,8 +188,17 @@ namespace Script.LPModel
             lpsolve.delete_lp(LpModel);
         }
 
-        //Computes the 1d array index (counted from top left to bottom right)
-        //for edge from sourceCell to destCell. Indexes of variables in lpsolve start at 1.
+        ///<summary>
+        ///Computes the 1d array index (counted from top left to bottom right)
+        ///for edge corresponding to flux from sourceCell to destCell in a square grid.
+        /// Indexes of variables in lpsolve start at 1, so the return is indexed starting from 1.
+        /// </summary>
+        /// <param name="sourceCell">
+        /// The cell from which the flux originates, -1 if flux comes from outside the grid
+        /// </param>
+        /// <param name="destCell">The cell to which the flux flows, -1 if flux flows to outside the grid</param>
+        /// <param name="gridDimension">The dimension of the grid</param>
+        /// <<param name="isXDirection">Flag for if the flow is in the x-direction (left-right direction).</param>
         private static int GridToEdgeIndex(int sourceCell, int destCell, int gridDimension, bool isXDirection)
         {
             if (isXDirection)
@@ -228,7 +237,14 @@ namespace Script.LPModel
             }
 
         }
-
+        
+        /// <summary>
+        /// Gives all the 1d edge indexes in a square grid for a tile in a given row and column
+        /// </summary>
+        /// <param name="rowNumber">Row number of tile</param>
+        /// <param name="colNumber">Column number of tile</param>
+        /// <param name="gridDimension">The dimension of the grid</param>
+        /// <returns></returns>
         private static int[] TileEdgeIndices(int rowNumber, int colNumber, int gridDimension)
         {
             //1d index of current cell

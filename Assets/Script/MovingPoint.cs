@@ -12,8 +12,8 @@ public class MovingPoint : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
-		Velocity = Random.insideUnitCircle * 5f;
-    }
+		Velocity = Vector2.zero;
+	}
 	
 	//Called every frame
 	void Update()

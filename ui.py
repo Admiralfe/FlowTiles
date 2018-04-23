@@ -1,13 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from lxml import etree
-import system
+import sys
 
 grid_size = sys.argv[1]
 row_index = sys.argv[2]
 col_index = sys.argv[3]
 velocity_xml_file = sys.argv[4]
-valid_tiles_xml_file = arg.argv[5]
+valid_tiles_xml_file = sys.argv[5]
 
 velocity_root = etree.parse(velocity_xml_file).getroot()
 valid_tiles_root = etree.parse(valid_tiles_xml_file).getroot()
@@ -35,7 +35,7 @@ for tile in velocity_root:
         grid_ax.quiver(x, y, vx, vy)
 
 no_valid_tiles = len(valid_tile_root)
-valid_tiles_axes = valid_tiles_fig.subplots((no_valid_tiles - no_valid_tiles%3)/3 + 1), 3)
+valid_tiles_axes = valid_tiles_fig.subplots(((no_valid_tiles - no_valid_tiles%3)/3 + 1), 3)
 
 for i in range(0, no_valid_tiles):
     ax = valid_tiles_axes[i]

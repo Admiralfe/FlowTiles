@@ -169,7 +169,7 @@ namespace lpsolve55
 
         private const String dllFileNameWindows = "lpsolve55.dll";
         private const String dllFileNameLinux = "liblpsolve55.so";
-        private const String dllFileNameCurrent = dllFileNameWindows;
+        private const String dllFileNameCurrent = dllFileNameLinux;
 
         [DllImport(dllFileNameCurrent, SetLastError = true)]
         public static extern byte add_column(IntPtr lp, double[] column);
