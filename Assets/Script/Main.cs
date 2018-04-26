@@ -35,9 +35,8 @@ public class Main : MonoBehaviour
         GameObject myBackGround = Instantiate(BackGround, new Vector3(0, 0, 0), Quaternion.identity);
         myBackGround.transform.localScale += new Vector3(BackGroundScale - 1, BackGroundScale - 1);
         myBackGround.transform.Translate(new Vector3(BackGroundScale / 2, BackGroundScale / 2));
-		
-		GridBuilder gridBuilder = new GridBuilder(-4, 4, -4, 4, TileGridDimension, 10);
-		TileGrid = gridBuilder.BuildRandomTileGrid();
+
+        TileGrid = GridBuilder.BuildFromXML(@"C:\Users\Felix Liu\source\repos\FTGridbuilding\TileGrid.xml");
 
 		for (int i = 0; i < numberOfAgents; i++)
 		{

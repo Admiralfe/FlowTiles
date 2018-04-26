@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Script.FlowTileUtils;
 using Script.LPModel;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.WSA;
 using Random = System.Random;
+using System.Xml;
 
 namespace Script.GridBuilding
 {
@@ -36,17 +34,17 @@ namespace Script.GridBuilding
             gridDimension = gridDimensionIn;
 
             innerTileGridDimension = innerTileGridDimensionIn;
-            
+
             foreach (Vector2 cornerVelocity in allowedVelocitiesIn)
             {
                 allowedVelocities.Add(cornerVelocity);
             }
 
             tileGrid = new TileGrid(gridDimension);
-            
+
             //LPSolve.BuildInitialModel(minXFlux, maxXFlux, minYFlux, maxYFlux, tileGrid);
         }
-        
+
         public GridBuilder(int minXFluxIn, int maxXFluxIn, int minYFluxIn, int maxYFluxIn, int gridDimensionIn,
             int innerTileGridDimensionIn)
         {
@@ -57,11 +55,11 @@ namespace Script.GridBuilding
             gridDimension = gridDimensionIn;
 
             innerTileGridDimension = innerTileGridDimensionIn;
-            
+
             allowedVelocities.Add(Vector2.zero);
-            
+
             tileGrid = new TileGrid(gridDimension);
-            
+
             //LPSolve.BuildInitialModel(minXFlux, maxXFlux, minYFlux, maxYFlux, tileGrid);
         }
 
@@ -74,12 +72,12 @@ namespace Script.GridBuilding
         {
             return tileGrid;
         }
-        
+
         public TileGrid BuildRandomTileGrid()
         {
             //Clear the tilegrid.
             tileGrid = new TileGrid(gridDimension);
-            
+
             Random RNG = new Random();
             for (int row = 0; row < gridDimension; row++)
             {
@@ -110,27 +108,27 @@ namespace Script.GridBuilding
             Vector2? allowedBottomLeftVelocity = null;
             Vector2? allowedTopRightVelocity = null;
             Vector2? allowedBottomRightVelocity = null;
-            
+
             bool topLeftRestricted = false;
             bool bottomLeftRestricted = false;
             bool topRightRestricted = false;
             bool bottomRightRestricted = false;
-            
+
             //Left tile
-            if(tileGrid.HasTile(rowNumber, colNumber - 1))
+            if (tileGrid.HasTile(rowNumber, colNumber - 1))
             {
                 allowedTopLeftVelocity = tileGrid.GetFlowTile(rowNumber, colNumber - 1).CornerVelocities.TopRight;
                 allowedBottomLeftVelocity =
-                    tileGrid.GetFlowTile(rowNumber, colNumber - 1).CornerVelocities.BottomRight; 
-                
+                    tileGrid.GetFlowTile(rowNumber, colNumber - 1).CornerVelocities.BottomRight;
+
                 topLeftRestricted = true;
                 bottomLeftRestricted = true;
             }
-            
+
             //Top left tile
             if (tileGrid.HasTile(rowNumber + 1, colNumber - 1))
             {
-                
+
                 //Checks if velocity restriction has been set already, in that case we don't need to set it again, 
                 //since it will be the same in a valid tiling.
                 if (!topLeftRestricted)
@@ -140,7 +138,7 @@ namespace Script.GridBuilding
                     topLeftRestricted = true;
                 }
             }
-            
+
             //Bottom left tile
             if (tileGrid.HasTile(rowNumber - 1, colNumber - 1))
             {
@@ -151,31 +149,31 @@ namespace Script.GridBuilding
                     bottomLeftRestricted = true;
                 }
             }
-            
+
             //Top tile
             if (tileGrid.HasTile(rowNumber + 1, colNumber))
             {
                 if (!topLeftRestricted)
                 {
-                    allowedTopLeftVelocity = 
+                    allowedTopLeftVelocity =
                         tileGrid.GetFlowTile(rowNumber + 1, colNumber).CornerVelocities.BottomLeft;
                     topLeftRestricted = true;
                 }
 
                 if (!topRightRestricted)
                 {
-                    allowedTopRightVelocity = 
+                    allowedTopRightVelocity =
                         tileGrid.GetFlowTile(rowNumber + 1, colNumber).CornerVelocities.BottomLeft;
                     topRightRestricted = true;
                 }
             }
-            
+
             //Bottom Tile
             if (tileGrid.HasTile(rowNumber - 1, colNumber))
             {
                 if (!bottomLeftRestricted)
                 {
-                    allowedBottomLeftVelocity = 
+                    allowedBottomLeftVelocity =
                         tileGrid.GetFlowTile(rowNumber - 1, colNumber).CornerVelocities.TopLeft;
                     bottomLeftRestricted = true;
                 }
@@ -187,7 +185,7 @@ namespace Script.GridBuilding
                     bottomRightRestricted = true;
                 }
             }
-            
+
             //Right Tile
             if (tileGrid.HasTile(rowNumber + 1, colNumber))
             {
@@ -205,17 +203,17 @@ namespace Script.GridBuilding
                     topRightRestricted = true;
                 }
             }
-            
+
             //Top right tile
             if (tileGrid.HasTile(rowNumber + 1, colNumber + 1))
             {
                 if (!topRightRestricted)
                 {
-                    allowedTopRightVelocity = 
+                    allowedTopRightVelocity =
                         tileGrid.GetFlowTile(rowNumber + 1, colNumber + 1).CornerVelocities.TopRight;
                 }
             }
-            
+
             //Bottom right tile
             if (tileGrid.HasTile(rowNumber + 1, colNumber - 1))
             {
@@ -257,13 +255,13 @@ namespace Script.GridBuilding
 
             List<CornerVelocities> combinationList = new List<CornerVelocities>();
 
-            foreach (Vector2 v1 in iteratorVectorList[(int) Corner.TopLeft])
+            foreach (Vector2 v1 in iteratorVectorList[(int)Corner.TopLeft])
             {
-                foreach (Vector2 v2 in iteratorVectorList[(int) Corner.TopRight])
+                foreach (Vector2 v2 in iteratorVectorList[(int)Corner.TopRight])
                 {
-                    foreach (Vector2 v3 in iteratorVectorList[(int) Corner.BottomLeft])
+                    foreach (Vector2 v3 in iteratorVectorList[(int)Corner.BottomLeft])
                     {
-                        foreach (Vector2 v4 in iteratorVectorList[(int) Corner.BottomRight])
+                        foreach (Vector2 v4 in iteratorVectorList[(int)Corner.BottomRight])
                         {
                             combinationList.Add(new CornerVelocities(v1, v2, v3, v4));
                         }
@@ -273,7 +271,7 @@ namespace Script.GridBuilding
 
             return combinationList;
         }
-        
+
         /// <summary>
         /// Finds the valid flow tiles to be put in a position given by row and column indices.
         /// The constraints are partially that edge fluxes should match and that the field needs to be divergence free.
@@ -290,17 +288,17 @@ namespace Script.GridBuilding
             {
                 throw new ArgumentException("Tile already exists on that position");
             }
-            
+
             int[] validTopFluxRange = new int[2];
             int[] validBottomFluxRange = new int[2];
             int[] validLeftFluxRange = new int[2];
             int[] validRightFluxRange = new int[2];
-            
+
             //Finds the restrictions on corner velocities
             Vector2?[] restrictions = velocityRestrictions(rowNumber, colNumber);
             //Finds all valid combinations of the allowed corner velocities.
             List<CornerVelocities> allowedCornerVelocities = cornerVelocityCombinations(restrictions);
-                        
+
             if (rowNumber == 0)
             {
                 validTopFluxRange[0] = 0;
@@ -382,7 +380,7 @@ namespace Script.GridBuilding
                     }
                 }
             }
-            
+
             /*
             foreach (FlowTile tile in currentValidTiles)
             {
@@ -399,10 +397,36 @@ namespace Script.GridBuilding
                 LPSolve.FilterValidTiles(currentValidTiles, rowNumber, colNumber, gridDimension);
 
             //Console.WriteLine("final number of tiles: " + newValidTiles.Count);
-            
+
             return validTiles;
         }
-        
+
+        public static TileGrid BuildFromXML(string filename)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            XmlReader reader = new XmlTextReader(filename);
+            xmlDoc.Load(reader);
+            XmlElement root = xmlDoc.DocumentElement;
+            int Dimension = (int)Math.Sqrt(root.ChildNodes.Count);
+            TileGrid tileGrid = new TileGrid(Dimension);
+            int TileSize = (int)Math.Sqrt(root.ChildNodes[0].ChildNodes.Count);
+
+            foreach (XmlElement tile in root.ChildNodes)
+            {
+                FlowTile flowTile = new FlowTile(TileSize);
+                foreach (XmlElement velocity in tile)
+                {
+                    double x = double.Parse(velocity.GetAttribute("relX"));
+                    double y = double.Parse(velocity.GetAttribute("relY"));
+                    double vx = double.Parse(velocity.GetAttribute("vx"));
+                    double vy = double.Parse(velocity.GetAttribute("vy"));
+                    flowTile.SetVelocity(x, y, vx, vy);
+                }
+                tileGrid.AddTile(int.Parse(tile.GetAttribute("row")), int.Parse(tile.GetAttribute("col")), flowTile);
+            }
+            return tileGrid;
+
+        }
     }
 
 }

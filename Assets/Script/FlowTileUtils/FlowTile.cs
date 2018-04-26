@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Script.FlowTileUtils;
+using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -55,7 +56,21 @@ namespace Script.FlowTileUtils
             GenerateStreamFunctionGrid();
             GenerateVelocityGrid();
         }
-        
+
+        public FlowTile(int gridSize)
+        {
+            Flux = new Flux(0, 0, 0, 0);
+            CornerVelocities = new CornerVelocities(new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0));
+            GridSize = gridSize;
+            StreamFunctionGridSize = GridSize + 1;
+            StreamFunctionGrid = new float[StreamFunctionGridSize, StreamFunctionGridSize];
+            VelocityGrid = new Vector2[GridSize, GridSize];
+            ControlPoints = new Vector3[4, 4];
+            GenerateStreamFunctionGrid();
+            GenerateVelocityGrid();
+
+        }
+
 
 
         private void GenerateStreamFunctionGrid()
@@ -316,9 +331,19 @@ namespace Script.FlowTileUtils
                 WriteToFile(writer);
             }
         }
-        
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x">Between 0 and 1</param>
+        /// <param name="y">Between 0 and 1</param>
+        public void SetVelocity(double x, double y, double vx, double vy)
+        {
+            VelocityGrid[(int)(x * GridSize), (int)(y * GridSize)] = new Vector2((float)vx, (float)vy);
+        }
     }
+
+
     
     public struct Flux
     {
