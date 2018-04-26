@@ -143,28 +143,47 @@ namespace Script.FlowTileUtils
 				throw new ArgumentException("y-coordinate out of bounds");
 			}
 
-			if (x > 0.99)
-			{
-				x = GridSize - 1;
-			}
-			else
-			{
-				x = (float)Math.Floor(x * GridSize);
-			}
-
-			if (y > 0.99)
-			{
-				y = GridSize - 1;
-			}
-			else
-			{
-				y = (float) Math.Floor(y * GridSize);
-			}
-			return Velocity((int) x, (int) y);
+		    return VelocityFromNonNormPos(x * (GridSize - 1), y * (GridSize - 1));
 		}
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x">Between 0 and GridSize-1</param>
+        /// <param name="y">Between 0 and GridSize-1</param>
+        /// <returns></returns>
         public Vector2 Velocity(int x, int y)
         {
+            return VelocityGrid[y, x];
+        }
+        
+        /// <summary>
+        /// Warning, lethal! This method can kill you. 
+        /// </summary>
+        /// <param name="x">Between 0 and GridSize-1</param>
+        /// <param name="y">Between 0 and GridSize-1</param>
+        /// <returns></returns>
+        private Vector2 VelocityFromNonNormPos(float x, float y)
+        {
+            int xApprox = (int) (x + 0.5F);
+            int yApprox = (int) (y + 0.5F);
+            if (Math.Abs(x - xApprox) < 0.01F)
+            {
+                if (Math.Abs(y - yApprox) < 0.01F)
+                {
+                    return VelocityGrid[yApprox, xApprox];
+                }
+            }
+
+            Vector2 vBotLeft = VelocityGrid[(int) x, (int) y];
+            Vector2 vBotRight = VelocityGrid[(int) (x + 1.0F), (int) y];
+            Vector2 vTopLeft = VelocityGrid[(int) x, (int) (y + 0.1F)];
+            Vector2 vTopRight = VelocityGrid[(int) (x + 1.0F), (int) (y + 1.0F)];
+
+            return ((vTopRight - vBotRight) * y + vBotRight - (vTopLeft - vBotLeft) * y - vBotLeft) * x +
+                   (vTopLeft - vBotLeft) * y + vBotLeft;
+            
+            
             return VelocityGrid[y, x];
         }
         
@@ -344,9 +363,6 @@ namespace Script.FlowTileUtils
         {
             VelocityGrid[(int)(x * GridSize), (int)(y * GridSize)] = new Vector2((float)vx, (float)vy);
         }
-    }
-
-
 
         public XmlElement ToXmlElement(XmlDocument xmlDoc)
         {
