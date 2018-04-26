@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Script.FlowTileUtils;
 using Script.GridBuilding;
+using UnityEditor.Experimental.UIElements.GraphView;
 using UnityEngine.WSA;
 
 public class Main : MonoBehaviour
@@ -24,6 +25,20 @@ public class Main : MonoBehaviour
 	
 	private void Start ()
 	{
+		GridBuilder gridBuilder = new GridBuilder(-4, 4, -4, 4, TileGridDimension, 10);
+		
+		for (int row = 0; row < gridBuilder.gridDimension; row++)
+		{
+			for (int col = 0; col < gridBuilder.gridDimension; col++)
+			{
+				Debug.Log(row + ", " + col);
+				FlowTile tile = gridBuilder.AskUserForTile(row, col);
+				gridBuilder.AddTile(row, col, tile);
+			}
+		}
+
+		TileGrid = gridBuilder.GetTileGrid();
+		
         //Makes the camera square.
         Camera.main.aspect = 1;
 

@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Xml;
 using UnityEngine;
 
 namespace Script.FlowTileUtils
@@ -42,10 +43,12 @@ namespace Script.FlowTileUtils
 
         public FlowTile(int gridSize, Flux flux, CornerVelocities cornerVelocities)
         {
+            /*
             if (flux.LeftEdge + flux.BottomEdge != flux.RightEdge + flux.TopEdge)
             {
                 throw new ArgumentException("The net flux in and out a flow tile must be zero");
             }
+            */
             GridSize = gridSize;
             StreamFunctionGridSize = GridSize + 1;
             StreamFunctionGrid = new float[StreamFunctionGridSize, StreamFunctionGridSize];
@@ -344,6 +347,25 @@ namespace Script.FlowTileUtils
     }
 
 
+
+        public XmlElement ToXmlElement(XmlDocument xmlDoc)
+        {
+            XmlElement element = xmlDoc.CreateElement("tile");
+            for (int y = 0; y < GridSize; y++)
+            {
+                for (int x = 0; x < GridSize; x++)
+                {
+                    XmlElement velocity = xmlDoc.CreateElement("velocity");
+                    velocity.SetAttribute("relX", x.ToString());
+                    velocity.SetAttribute("relY", y.ToString());
+                    velocity.SetAttribute("vx", Velocity(x, y).x.ToString());
+                    velocity.SetAttribute("vy", Velocity(x, y).y.ToString());
+                    element.AppendChild(velocity);
+                }
+            }
+            return element;
+        }
+    }
     
     public struct Flux
     {

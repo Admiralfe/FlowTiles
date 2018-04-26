@@ -3,33 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml;
+using System.Xml.Serialization;
 using Script.FlowTileUtils;
+using UnityEngine;
 using UnityEngine.XR.WSA.Persistence;
 
 public class TileGrid : IEnumerable<FlowTile>
 {
-
-    /*
-    public class FlowTile
-    {
-        //public Vector2 cornerVelocity;
-
-        public int TopFlux { get; }
-        public int RightFlux { get; }
-        public int BottomFlux { get; }
-        public int LeftFlux { get; }
-     
-        public FlowTile(int topFluxIn, int rightFluxIn, int bottomFluxIn, int leftFluxIn)
-        {
-            TopFlux = topFluxIn;
-            RightFlux = rightFluxIn;
-            BottomFlux = bottomFluxIn;
-            LeftFlux = leftFluxIn;
-            //cornerVelocity = cornerVelocityIn;
-        }
-    }
-    */
-
     public int Dimension;
 
     //Rows and columns in the 2d part
@@ -60,6 +41,22 @@ public class TileGrid : IEnumerable<FlowTile>
         return TileSet[rowIndex, colIndex];
     }
 
+    public bool isFull()
+    {
+        for (int i = 0; i < Dimension; i++)
+        {
+            for (int j = 0; j < Dimension; j++)
+            {
+                if (!HasTile(i, j))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     public int[] GetRowColIndexes(float x, float y)
     {
         int rowIndex = (int) Math.Floor(y * Dimension);
@@ -80,6 +77,26 @@ public class TileGrid : IEnumerable<FlowTile>
                 }
             }
         }
+    }
+
+    public void WriteToXML(string filename)
+    {
+        XmlDocument xmlDoc = new XmlDocument();
+        XmlElement root = xmlDoc.CreateElement("tilegrid");
+
+        for (int i = 0; i < Dimension; i++)
+        {
+            for (int j = 0; j < Dimension; j++)
+            {
+                var tile = GetFlowTile(i, j);
+                if(tile == null) continue;
+                XmlElement xmlTile = tile.ToXmlElement(xmlDoc);
+                xmlTile.SetAttribute("row", i.ToString());
+                xmlTile.SetAttribute("col", j.ToString());
+                root.AppendChild(xmlTile);
+            }
+        }
+        xmlDoc.Save(filename);
     }
 
     public IEnumerator<FlowTile> GetEnumerator()

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Script.FlowTileUtils;
 using Script.LPModel;
@@ -73,6 +75,61 @@ namespace Script.GridBuilding
             return tileGrid;
         }
 
+        private void WriteTilesToXML(List<FlowTile> tiles, string filename)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            XmlElement root = xmlDoc.CreateElement("root");
+            foreach (var tile in tiles)
+            {
+                root.AppendChild(tile.ToXmlElement(xmlDoc));
+            }
+            xmlDoc.Save(filename);
+        }
+
+        public FlowTile AskUserForTile(int row, int col)
+        {
+            LPSolve.BuildInitialModel(minXFlux, maxXFlux, minYFlux, maxYFlux, tileGrid);
+            List<FlowTile> validTiles = ValidTiles(row, col);    
+            
+            string pathToScript = "/home/felix/FlowTiles/ui.py";
+            string path = Directory.GetCurrentDirectory();
+            string gridPath = path + "grid.xml";
+            UnityEngine.Debug.Log(gridPath);
+            string validTilesPath = path + "validtiles.xml";
+            tileGrid.WriteToXML(gridPath);    
+            WriteTilesToXML(validTiles, validTilesPath);
+            
+            ProcessStartInfo start = new ProcessStartInfo();
+            start.FileName = "/usr/bin/python3";
+            start.Arguments = string.Format("{0} {1} {2} {3} {4} {5}",
+                pathToScript, gridDimension, row, col, gridPath, validTilesPath);
+            start.UseShellExecute = false;
+            start.RedirectStandardOutput = true;
+            
+            
+            using (Process process = Process.Start(start))
+            {
+                using (StreamReader reader = process.StandardOutput)
+                {
+                    string result = reader.ReadToEnd();
+                    //Console.WriteLine(result);
+                }
+            }
+            
+
+            //Process python = Process.Start(start);
+            //python.WaitForExit();
+            Console.WriteLine("Which tile do you want at row {0}, column {1}. Type a number:", row, col);
+            var num = Convert.ToInt32(Console.ReadLine());
+            
+            UnityEngine.Debug.Log(num);
+            
+            //python.Close();
+            LPSolve.FreeModel();
+
+            return validTiles[num];
+            }
+        
         public TileGrid BuildRandomTileGrid()
         {
             //Clear the tilegrid.
@@ -233,14 +290,13 @@ namespace Script.GridBuilding
 
         private List<CornerVelocities> cornerVelocityCombinations(Vector2?[] restrictions)
         {
-            int numberOfUnrestricted = 0;
             List<Vector2>[] iteratorVectorList = new List<Vector2>[4];
-
+            
             for (int i = 0; i < 4; i++)
             {
+                iteratorVectorList[i] = new List<Vector2>();
                 if (!restrictions[i].HasValue)
                 {
-                    numberOfUnrestricted++;
                     foreach (Vector2 cornerVelocity in allowedVelocities)
                     {
                         iteratorVectorList[i].Add(cornerVelocity);
@@ -274,7 +330,7 @@ namespace Script.GridBuilding
 
         /// <summary>
         /// Finds the valid flow tiles to be put in a position given by row and column indices.
-        /// The constraints are partially that edge fluxes should match and that the field needs to be divergence free.
+        /// The constraints are that edge fluxes should match and that the field needs to be divergence free.
         /// </summary>
         /// <param name="rowNumber">Row index in grid</param>
         /// <param name="colNumber">Column index in grid</param>
