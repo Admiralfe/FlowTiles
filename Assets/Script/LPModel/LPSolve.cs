@@ -328,45 +328,6 @@ namespace Script.LPModel
 
             return returnList;
         }
-
-        /*
-        public static void Main(string[] args)
-        {
-            /*   System.Console.WriteLine(lpsolve.get_Nrows(LpModel));
-            TileGrid myTileGrid = new TileGrid(dimension);
-            Flux flux = new Flux
-            {
-                topEdge = 0,
-                bottomEdge = -1,
-                rightEdge = 1,
-                leftEdge = 0
-            };
-    
-            myTileGrid.AddTile(0, 0, new FlowTile(10, flux, new CornerVelocities()));
-    
-            BuildInitialModel(-1, 1, -1, 1, myTileGrid);
-            lpsolve.print_lp(LpModel);
-            
-
-            int dimension = 5;
-
-            GridBuilder gridBuilder = new GridBuilder(-3, 3, -3, 3, dimension, 10);
-            TileGrid tileGrid = gridBuilder.BuildRandomTileGrid();
-            for (int row = 0; row < dimension; row++)
-            {
-                for (int col = 0; col < dimension; col++)
-                {
-                    FlowTile currentTile = tileGrid.GetFlowTile(row, col);
-                    System.Console.WriteLine("Position " + "(" + row + "," + col + ")" + " : top = " +
-                                             currentTile.Flux.TopEdge + ", right = " + currentTile.Flux.RightEdge +
-                                             ", bottom = " + currentTile.Flux.BottomEdge + ", left = " +
-                                             currentTile.Flux.LeftEdge);
-                }
-            }
-
-
-        }
-        */
     }
 
 }
