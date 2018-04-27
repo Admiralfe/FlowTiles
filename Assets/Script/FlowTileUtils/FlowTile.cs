@@ -62,7 +62,7 @@ namespace Script.FlowTileUtils
 
         public FlowTile(int gridSize)
         {
-            Flux = new Flux(0, 0, 0, 0);
+            Flux = new Flux(0);
             CornerVelocities = new CornerVelocities(new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0));
             GridSize = gridSize;
             StreamFunctionGridSize = GridSize + 1;
@@ -81,10 +81,10 @@ namespace Script.FlowTileUtils
             //Biggest index in VelocityGrid
             int max = GridSize - 1;
             SetControlPoint(x : -0.5, y : -0.5 , value: 0.0);
-            SetControlPoint(x : max + 0.5, y : -0.5, value: Flux.BottomEdge);
-            SetControlPoint(x : -0.5, y : max + 0.5, value: -Flux.LeftEdge);
+            SetControlPoint(x : max + 0.5, y : -0.5, value: Flux.BottomEdge * Flux.FluxBase);
+            SetControlPoint(x : -0.5, y : max + 0.5, value: -Flux.LeftEdge * Flux.FluxBase);
             SetControlPoint(x : max + 0.5, y : max + 0.5 , 
-                              value: GetControlPoint(x: -0.5, y: max + 0.5).z + Flux.TopEdge);
+                              value: GetControlPoint(x: -0.5, y: max + 0.5).z + Flux.TopEdge * Flux.FluxBase);
 
             //set points around the corners
             //bottom left
@@ -186,15 +186,12 @@ namespace Script.FlowTileUtils
             Vector2 vBotRight = VelocityGrid[(int) (x + 1.0F), (int) y];
             Vector2 vTopLeft = VelocityGrid[(int) x, (int) (y + 1.0F)];
             Vector2 vTopRight = VelocityGrid[(int) (x + 1.0F), (int) (y + 1.0F)];
-            */
-            Vector2 vBotLeft = VelocityGrid[(int) Math.Floor(x), (int) Math.Ceiling(y)];
-            Vector2 vBotRight = VelocityGrid[(int) Math.Ceiling(x), (int) Math.Floor(y)];
-            Vector2 vTopLeft = VelocityGrid[(int) Math.Floor(x), (int) Math.Ceiling(y)];
-            Vector2 vTopRight = VelocityGrid[(int) Math.Ceiling(x), (int) Math.Ceiling(y)];
 
+            float relX = x - (float)Math.Floor(x);
+            float relY = y - (float)Math.Floor(y);
 
-            return ((vTopRight - vBotRight) * y + vBotRight - (vTopLeft - vBotLeft) * y - vBotLeft) * x +
-                   (vTopLeft - vBotLeft) * y + vBotLeft;
+            return ((vTopRight - vBotRight) * relY + vBotRight - (vTopLeft - vBotLeft) * relY - vBotLeft) * relX +
+                   (vTopLeft - vBotLeft) * relY + vBotLeft;
         }
         
         /// <summary>
@@ -399,6 +396,7 @@ namespace Script.FlowTileUtils
         public int RightEdge;
         public int TopEdge;
         public int BottomEdge;
+        public float FluxBase;
         
         public Flux(int a)
         {
@@ -406,14 +404,16 @@ namespace Script.FlowTileUtils
             RightEdge = 0;
             TopEdge = 0;
             BottomEdge = 0;
+            FluxBase = 1;
         }
 
-        public Flux(int leftEdge, int rightEdge, int topEdge, int bottomEdge)
+        public Flux(int leftEdge, int rightEdge, int topEdge, int bottomEdge, float fluxBase)
         {
             LeftEdge = leftEdge;
             RightEdge = rightEdge;
             TopEdge = rightEdge;
             BottomEdge = bottomEdge;
+            FluxBase = fluxBase;
         }
     }
 
