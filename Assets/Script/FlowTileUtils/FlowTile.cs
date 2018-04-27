@@ -165,26 +165,36 @@ namespace Script.FlowTileUtils
         /// <returns></returns>
         private Vector2 VelocityFromNonNormPos(float x, float y)
         {
+            
             int xApprox = (int) (x + 0.5F);
             int yApprox = (int) (y + 0.5F);
             if (Math.Abs(x - xApprox) < 0.01F)
             {
                 if (Math.Abs(y - yApprox) < 0.01F)
                 {
-                    return VelocityGrid[yApprox, xApprox];
+                    return VelocityGrid[xApprox, yApprox];
                 }
             }
+            
 
+
+            //We floor the floats to get the indexes, for the top/right indexes we add 1 to the coordinate
+            //which is the width and height of the grid cells, so that we are pushed to the next cell.
+            //Flooring then gives the correct index. 
+            /*
             Vector2 vBotLeft = VelocityGrid[(int) x, (int) y];
             Vector2 vBotRight = VelocityGrid[(int) (x + 1.0F), (int) y];
-            Vector2 vTopLeft = VelocityGrid[(int) x, (int) (y + 0.1F)];
+            Vector2 vTopLeft = VelocityGrid[(int) x, (int) (y + 1.0F)];
             Vector2 vTopRight = VelocityGrid[(int) (x + 1.0F), (int) (y + 1.0F)];
+            */
+            Vector2 vBotLeft = VelocityGrid[(int) Math.Floor(x), (int) Math.Ceiling(y)];
+            Vector2 vBotRight = VelocityGrid[(int) Math.Ceiling(x), (int) Math.Floor(y)];
+            Vector2 vTopLeft = VelocityGrid[(int) Math.Floor(x), (int) Math.Ceiling(y)];
+            Vector2 vTopRight = VelocityGrid[(int) Math.Ceiling(x), (int) Math.Ceiling(y)];
+
 
             return ((vTopRight - vBotRight) * y + vBotRight - (vTopLeft - vBotLeft) * y - vBotLeft) * x +
                    (vTopLeft - vBotLeft) * y + vBotLeft;
-            
-            
-            return VelocityGrid[y, x];
         }
         
         /// <summary>

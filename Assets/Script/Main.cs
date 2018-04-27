@@ -24,21 +24,7 @@ public class Main : MonoBehaviour
 	}
 	
 	private void Start ()
-	{
-		GridBuilder gridBuilder = new GridBuilder(-4, 4, -4, 4, TileGridDimension, 10);
-		
-		for (int row = 0; row < gridBuilder.gridDimension; row++)
-		{
-			for (int col = 0; col < gridBuilder.gridDimension; col++)
-			{
-				Debug.Log(row + ", " + col);
-				FlowTile tile = gridBuilder.AskUserForTile(row, col);
-				gridBuilder.AddTile(row, col, tile);
-			}
-		}
-
-		TileGrid = gridBuilder.GetTileGrid();
-		
+	{	
         //Makes the camera square.
         Camera.main.aspect = 1;
 
@@ -46,6 +32,8 @@ public class Main : MonoBehaviour
 		//Translate the camera so lower left corner has coordinates (0, 0)
 		Camera.main.transform.Translate(new Vector3(Camera.main.orthographicSize * Camera.main.aspect,
 			Camera.main.orthographicSize, 0));
+
+        Debug.Log(GetTileWidth());
 
         GameObject myBackGround = Instantiate(BackGround, new Vector3(0, 0, 0), Quaternion.identity);
         myBackGround.transform.localScale += new Vector3(BackGroundScale - 1, BackGroundScale - 1);
@@ -55,8 +43,7 @@ public class Main : MonoBehaviour
 
 		for (int i = 0; i < numberOfAgents; i++)
 		{
-			GameObject p = Instantiate(Point, new Vector3(Random.Range(0, BackGroundScale), Random.Range(0, BackGroundScale), 0),
-				Quaternion.identity);
+			GameObject p = Instantiate(Point, new Vector3(1, Random.Range(0, BackGroundScale), 0), Quaternion.identity);
 			p.GetComponent<MovingPoint>().MainRef = this;
 		}
 	}

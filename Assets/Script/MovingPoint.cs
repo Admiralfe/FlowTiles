@@ -42,6 +42,11 @@ public class MovingPoint : MonoBehaviour
         }
 
         Velocity = MainRef.TileGrid.GetFlowTile(rowColIndex[0], rowColIndex[1]).Velocity(relXPos, relYPos);
+
+        if (Velocity.x < 0)
+        {
+            Debug.Log("y: " + transform.position.y);
+        }
 		
 		transform.Translate(Velocity * Time.deltaTime);
 	}
