@@ -9,6 +9,7 @@ public class MovingPoint : MonoBehaviour
 	public Vector2 Velocity;
 	public Main MainRef;
     private int[] rowColIndex;
+    private float collisionRadius;
     
     //Which layer of the flow tile the point follows.
     public int FollowingLayer;
@@ -17,14 +18,45 @@ public class MovingPoint : MonoBehaviour
 	void Start()
 	{
 		Velocity = Vector2.zero;
+        collisionRadius = 0.15f;
 	}
 	
+    private void updateCurrentTile() 
+    {
+        if (MainRef.TileGrid_1.GetRowColIndexes(transform.position.x / MainRef.BackGroundScale,
+        	transform.position.y / MainRef.BackGroundScale) != rowColIndex)
+        {
+            MainRef.TileGrid_1.GetFlowTile(MainRef.TileGridDimension - rowColIndex[0] - 1, rowColIndex[1]).Agents.Remove(gameObject);
+            
+            rowColIndex = MainRef.TileGrid_1.GetRowColIndexes(transform.position.x / MainRef.BackGroundScale,
+        	transform.position.y / MainRef.BackGroundScale);
+
+            MainRef.TileGrid_1.GetFlowTile(MainRef.TileGridDimension - rowColIndex[0] - 1, rowColIndex[1]).Agents.Add(gameObject);
+        }
+    }
+
+    private void collisionAvoidance(float relXPos, float relYPos)
+    {
+        FlowTile currentTile = MainRef.TileGrid_1.GetFlowTile(MainRef.TileGridDimension - rowColIndex[0] - 1, rowColIndex[1]);
+
+        foreach (GameObject otherAgent in currentTile.Agents) 
+        {
+            if (otherAgent != gameObject) 
+            {
+                if ((transform.position - otherAgent.transform.position).magnitude < collisionRadius) 
+                {
+                    Velocity = (transform.position - otherAgent.transform.position).normalized; 
+                }
+            }
+        }   
+    }
+
 	//Called every frame
 	void Update()
 	{
         rowColIndex = MainRef.TileGrid_1.GetRowColIndexes(transform.position.x / MainRef.BackGroundScale,
         	transform.position.y / MainRef.BackGroundScale);
-
+        
         //Relative position the point has IN the tile it is currently in, from 0 to 1.
         float relXPos = (transform.position.x - rowColIndex[1] * MainRef.GetTileWidth()) / MainRef.GetTileWidth();
         float relYPos = (transform.position.y - rowColIndex[0] * MainRef.GetTileWidth()) / MainRef.GetTileWidth();
@@ -60,7 +92,10 @@ public class MovingPoint : MonoBehaviour
             Debug.Log("RelY: " + relYPos);
         }
         */
-		
+		collisionAvoidance(relXPos, relYPos);
+
 		transform.Translate(Velocity * Time.deltaTime);
+
+        updateCurrentTile();
 	}
 }

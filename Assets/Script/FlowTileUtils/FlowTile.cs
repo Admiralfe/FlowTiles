@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;   
 using System.Xml;
 using UnityEngine;
 
@@ -41,6 +42,11 @@ namespace Script.FlowTileUtils
         /// </summary>
         private Vector3[,] ControlPoints;
 
+        /// <summary>
+        /// The agents currently on this flowtile, stored for collision detection.
+        ///</summary>
+        public List<GameObject> Agents;
+
         public FlowTile(int gridSize, Flux flux, CornerVelocities cornerVelocities)
         {
             /*
@@ -56,6 +62,9 @@ namespace Script.FlowTileUtils
             CornerVelocities = cornerVelocities;
             VelocityGrid = new Vector2[GridSize, GridSize];
             ControlPoints = new Vector3[4,4];
+
+            Agents = new List<GameObject>();
+
             GenerateStreamFunctionGrid();
             GenerateVelocityGrid();
         }
@@ -69,6 +78,9 @@ namespace Script.FlowTileUtils
             StreamFunctionGrid = new float[StreamFunctionGridSize, StreamFunctionGridSize];
             VelocityGrid = new Vector2[GridSize, GridSize];
             ControlPoints = new Vector3[4, 4];
+
+            Agents = new List<GameObject>();
+
             GenerateStreamFunctionGrid();
             GenerateVelocityGrid();
 
@@ -181,7 +193,7 @@ namespace Script.FlowTileUtils
             //We floor the floats to get the indexes, for the top/right indexes we add 1 to the coordinate
             //which is the width and height of the grid cells, so that we are pushed to the next cell.
             //Flooring then gives the correct index. 
-            /*
+            
             Vector2 vBotLeft = VelocityGrid[(int) x, (int) y];
             Vector2 vBotRight = VelocityGrid[(int) (x + 1.0F), (int) y];
             Vector2 vTopLeft = VelocityGrid[(int) x, (int) (y + 1.0F)];
@@ -479,9 +491,5 @@ namespace Script.FlowTileUtils
                 }
             }
         }
-        /// <summary>
-        /// Writes
-        /// </summary>
-        /// <param name="filename"></param>
     }
 }

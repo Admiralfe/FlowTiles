@@ -23,6 +23,14 @@ public class Main : MonoBehaviour
 	{
         return BackGroundScale / TileGridDimension;
 	}
+
+	private void loadAgentIntoTile(GameObject agent) 
+	{
+		int[] rowColIndex = TileGrid_1.GetRowColIndexes(transform.position.x / BackGroundScale,
+        	transform.position.y / BackGroundScale);
+
+		TileGrid_1.GetFlowTile(TileGridDimension - rowColIndex[0] - 1, rowColIndex[1]).Agents.Add(agent);
+	}	
 	
 	private void Start ()
 	{
@@ -47,6 +55,7 @@ public class Main : MonoBehaviour
 				Quaternion.identity);
 			p.GetComponent<MovingPoint>().FollowingLayer = 1;
 			p.GetComponent<MovingPoint>().MainRef = this;
+			loadAgentIntoTile(p);
 		}
 
 		for (int i = 0; i < numberOfAgents / 2; i++)
@@ -55,6 +64,7 @@ public class Main : MonoBehaviour
 				Quaternion.identity);
 			p.GetComponent<MovingPoint>().FollowingLayer = 2;
 			p.GetComponent<MovingPoint>().MainRef = this;
+			loadAgentIntoTile(p);
 		}
 	}
 }
