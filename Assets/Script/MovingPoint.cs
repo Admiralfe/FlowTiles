@@ -39,16 +39,78 @@ public class MovingPoint : MonoBehaviour
     {
         FlowTile currentTile = MainRef.TileGrid_1.GetFlowTile(MainRef.TileGridDimension - rowColIndex[0] - 1, rowColIndex[1]);
 
-        foreach (GameObject otherAgent in currentTile.Agents) 
+        foreach (GameObject otherAgent in currentTile.Agents)
         {
-            if (otherAgent != gameObject) 
+            if (otherAgent != gameObject)
             {
-                if ((transform.position - otherAgent.transform.position).magnitude < collisionRadius) 
+                if ((transform.position - otherAgent.transform.position).magnitude < collisionRadius)
                 {
-                    Velocity = (transform.position - otherAgent.transform.position).normalized; 
+                    Velocity = (transform.position - otherAgent.transform.position).normalized;
                 }
             }
-        }   
+        }
+
+        //Check for collisions in neighboring cell if agent is within collision radius of left edge of current cell.
+        if (relXPos < collisionRadius && rowColIndex[1] != 0)
+        {
+            FlowTile leftTile = MainRef.TileGrid_1.GetFlowTile(MainRef.TileGridDimension - rowColIndex[0] - 1, rowColIndex[1] - 1);
+            foreach (GameObject otherAgent in leftTile.Agents)
+            {
+                if (otherAgent != gameObject)
+                {
+                    if ((transform.position - otherAgent.transform.position).magnitude < collisionRadius)
+                    {
+                        Velocity = (transform.position - otherAgent.transform.position).normalized;
+                    }
+                }
+            }
+        }
+
+        //Check for collisions in neighboring cell if agent is within collision radius of right edge of current cell.
+        if (1 - relXPos < collisionRadius && rowColIndex[1] != MainRef.TileGridDimension - 1)
+        {
+            FlowTile rightTile = MainRef.TileGrid_1.GetFlowTile(MainRef.TileGridDimension - rowColIndex[0] - 1, rowColIndex[1] + 1);
+            foreach (GameObject otherAgent in rightTile.Agents)
+            {
+                if (otherAgent != gameObject)
+                {
+                    if ((transform.position - otherAgent.transform.position).magnitude < collisionRadius)
+                    {
+                        Velocity = (transform.position - otherAgent.transform.position).normalized;
+                    }
+                }
+            }
+        }
+
+        if (relYPos < collisionRadius && rowColIndex[0] != 0)
+        {
+            FlowTile bottomTile = MainRef.TileGrid_1.GetFlowTile(MainRef.TileGridDimension - rowColIndex[0], rowColIndex[1]);
+            foreach (GameObject otherAgent in bottomTile.Agents)
+            {
+                if (otherAgent != gameObject)
+                {
+                    if ((transform.position - otherAgent.transform.position).magnitude < collisionRadius)
+                    {
+                        Velocity = (transform.position - otherAgent.transform.position).normalized;
+                    }
+                }
+            }
+        }
+
+        if (1 - relYPos < collisionRadius && rowColIndex[0] != MainRef.TileGridDimension - 1)
+        {
+            FlowTile topTile = MainRef.TileGrid_1.GetFlowTile(MainRef.TileGridDimension - rowColIndex[0] - 2, rowColIndex[1]);
+            foreach (GameObject otherAgent in topTile.Agents)
+            {
+                if (otherAgent != gameObject)
+                {
+                    if ((transform.position - otherAgent.transform.position).magnitude < collisionRadius)
+                    {
+                        Velocity = (transform.position - otherAgent.transform.position).normalized;
+                    }
+                }
+            }
+        }
     }
 
 	//Called every frame
@@ -60,29 +122,45 @@ public class MovingPoint : MonoBehaviour
         //Relative position the point has IN the tile it is currently in, from 0 to 1.
         float relXPos = (transform.position.x - rowColIndex[1] * MainRef.GetTileWidth()) / MainRef.GetTileWidth();
         float relYPos = (transform.position.y - rowColIndex[0] * MainRef.GetTileWidth()) / MainRef.GetTileWidth();
+
+        if (FollowingLayer == 1)
+        {
+            Velocity = MainRef.TileGrid_1.GetFlowTile(MainRef.TileGrid_1.Dimension - rowColIndex[0] - 1, rowColIndex[1]).Velocity(relXPos, relYPos);
+        }
+        else
+        {
+            Velocity = MainRef.TileGrid_2.GetFlowTile(MainRef.TileGrid_2.Dimension - rowColIndex[0] - 1, rowColIndex[1]).Velocity(relXPos, relYPos);
+        }
+
+        collisionAvoidance(relXPos, relYPos);
+
+        transform.Translate(Velocity * Time.deltaTime);
+
         if (rowColIndex[1] == 0 && relXPos < 0.01f)
         {
             Destroy(gameObject);
+            MainRef.TileGrid_1.GetFlowTile(MainRef.TileGridDimension - rowColIndex[0] - 1, rowColIndex[1]).Agents.Remove(gameObject);
         }
         else if (rowColIndex[1] == MainRef.TileGridDimension - 1 && relXPos > 0.99f)
         {
             Destroy(gameObject);
+            MainRef.TileGrid_1.GetFlowTile(MainRef.TileGridDimension - rowColIndex[0] - 1, rowColIndex[1]).Agents.Remove(gameObject);
         }
         else if (rowColIndex[0] == 0 && relYPos < 0.01f)
         {
             Destroy(gameObject);
+            MainRef.TileGrid_1.GetFlowTile(MainRef.TileGridDimension - rowColIndex[0] - 1, rowColIndex[1]).Agents.Remove(gameObject);
         }
         else if (rowColIndex[0] == MainRef.TileGridDimension - 1 && relYPos > 0.99f)
         {
             Destroy(gameObject);
+            MainRef.TileGrid_1.GetFlowTile(MainRef.TileGridDimension - rowColIndex[0] - 1, rowColIndex[1]).Agents.Remove(gameObject);
+
         }
 
-        if (FollowingLayer == 1)
+        else
         {
-            Velocity = MainRef.TileGrid_1.GetFlowTile(rowColIndex[0], rowColIndex[1]).Velocity(relXPos, relYPos);
-        } else 
-        {
-            Velocity = MainRef.TileGrid_2.GetFlowTile(rowColIndex[0], rowColIndex[1]).Velocity(relXPos, relYPos);
+            updateCurrentTile();
         }
 
         /*
@@ -92,10 +170,5 @@ public class MovingPoint : MonoBehaviour
             Debug.Log("RelY: " + relYPos);
         }
         */
-		collisionAvoidance(relXPos, relYPos);
-
-		transform.Translate(Velocity * Time.deltaTime);
-
-        updateCurrentTile();
 	}
 }
