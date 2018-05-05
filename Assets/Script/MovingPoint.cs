@@ -18,7 +18,7 @@ public class MovingPoint : MonoBehaviour
 	void Start()
 	{
 		Velocity = Vector2.zero;
-        collisionRadius = 0.15f;
+        collisionRadius = 0.1f;
 	}
 	
     private void updateCurrentTile() 

@@ -233,7 +233,7 @@ Prefab:
     - target: {fileID: 114271870319781992, guid: d17d4f7066ef00d4ab9a893e3cd83cee,
         type: 2}
       propertyPath: numberOfAgents
-      value: 20
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 114271870319781992, guid: d17d4f7066ef00d4ab9a893e3cd83cee,
         type: 2}

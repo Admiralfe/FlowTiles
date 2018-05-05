@@ -34,10 +34,12 @@ public class Main : MonoBehaviour
 	
 	private void Start ()
 	{
-        //TileGrid_1 = GridBuilder.BuildFromXML("/home/felix/FTGridBuilding/TileGridHorisontal.xml");
-        //TileGrid_2 = GridBuilder.BuildFromXML("/home/felix/FTGridBuilding/TileGridVertical.xml");
+        TileGrid_1 = GridBuilder.BuildFromXML("/home/felix/FTGridBuilding/Tilings/Curve.xml");
+        //TileGrid_2 = GridBuilder.BuildFromXML("/home/felix/FTGridBuilding/Tilings/TileGridVertical.xml");
 
-        TileGrid_1 = GridBuilder.BuildFromXML(@"C:\Users\Felix Liu\source\repos\FTGridBuilding\Tilings\Curve.xml");
+		TileGrid_1.SmoothenEdges();
+
+        //TileGrid_1 = GridBuilder.BuildFromXML(@"C:\Users\Felix Liu\source\repos\FTGridBuilding\Tilings\Curve.xml");
         //TileGrid_2 = GridBuilder.BuildFromXML(@"C:\Users\Felix Liu\source\repos\FTGridBuilding\TileGridVertical.xml");
         
         //Makes the camera square.
@@ -54,7 +56,7 @@ public class Main : MonoBehaviour
 
 		for (int i = 0; i < numberOfAgents; i++)
 		{
-			GameObject p = Instantiate(Point, new Vector3(Random.Range(10f, 14f), Random.Range(14f, 18f), 0), Quaternion.identity);
+			GameObject p = Instantiate(Point, new Vector3(Random.Range(13f, 15f), Random.Range(15f, 17f), 0), Quaternion.identity);
 			p.GetComponent<MovingPoint>().FollowingLayer = 1;
 			p.GetComponent<MovingPoint>().MainRef = this;
 			loadAgentIntoTile(p);
@@ -63,12 +65,13 @@ public class Main : MonoBehaviour
         /*
 		for (int i = 0; i < numberOfAgents / 2; i++)
 		{
-			GameObject p = Instantiate(Point, new Vector3(Random.Range(9f, 11f), 7, 0),
+			GameObject p = Instantiate(Point, new Vector3(Random.Range(9f, 11f), Random.Range(5f, 7f), 0),
 				Quaternion.identity);
 			p.GetComponent<MovingPoint>().FollowingLayer = 2;
 			p.GetComponent<MovingPoint>().MainRef = this;
 			loadAgentIntoTile(p);
 		}
-        */
+		*/
+        
 	}
 }
