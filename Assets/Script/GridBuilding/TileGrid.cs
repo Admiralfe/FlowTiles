@@ -38,6 +38,11 @@ public class TileGrid : IEnumerable<FlowTile>
 
     public FlowTile GetFlowTile(int rowIndex, int colIndex)
     {
+        if (!HasTile(rowIndex, colIndex))
+        {
+            throw new ArgumentException("No flow tile on that slot.");
+        }
+
         return TileSet[rowIndex, colIndex];
     }
 

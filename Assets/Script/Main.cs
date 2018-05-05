@@ -9,7 +9,8 @@ using UnityEngine.WSA;
 public class Main : MonoBehaviour
 {
     public GameObject Point;
-    public TileGrid TileGrid;
+    public TileGrid TileGrid_1;
+	public TileGrid TileGrid_2;
     public GameObject BackGround;
 	
 	//Set this in Unity UI
@@ -22,23 +23,23 @@ public class Main : MonoBehaviour
 	{
         return BackGroundScale / TileGridDimension;
 	}
+
+	private void loadAgentIntoTile(GameObject agent) 
+	{
+		int[] rowColIndex = TileGrid_1.GetRowColIndexes(transform.position.x / BackGroundScale,
+        	transform.position.y / BackGroundScale);
+
+		TileGrid_1.GetFlowTile(TileGridDimension - rowColIndex[0] - 1, rowColIndex[1]).Agents.Add(agent);
+	}	
 	
 	private void Start ()
 	{
-		GridBuilder gridBuilder = new GridBuilder(-4, 4, -4, 4, TileGridDimension, 10);
-		
-		for (int row = 0; row < gridBuilder.gridDimension; row++)
-		{
-			for (int col = 0; col < gridBuilder.gridDimension; col++)
-			{
-				Debug.Log(row + ", " + col);
-				FlowTile tile = gridBuilder.AskUserForTile(row, col);
-				gridBuilder.AddTile(row, col, tile);
-			}
-		}
+        //TileGrid_1 = GridBuilder.BuildFromXML("/home/felix/FTGridBuilding/TileGridHorisontal.xml");
+        //TileGrid_2 = GridBuilder.BuildFromXML("/home/felix/FTGridBuilding/TileGridVertical.xml");
 
-		TileGrid = gridBuilder.GetTileGrid();
-		
+        TileGrid_1 = GridBuilder.BuildFromXML(@"C:\Users\Felix Liu\source\repos\FTGridBuilding\Tilings\Curve.xml");
+        //TileGrid_2 = GridBuilder.BuildFromXML(@"C:\Users\Felix Liu\source\repos\FTGridBuilding\TileGridVertical.xml");
+        
         //Makes the camera square.
         Camera.main.aspect = 1;
 
@@ -51,13 +52,23 @@ public class Main : MonoBehaviour
         myBackGround.transform.localScale += new Vector3(BackGroundScale - 1, BackGroundScale - 1);
         myBackGround.transform.Translate(new Vector3(BackGroundScale / 2, BackGroundScale / 2));
 
-        TileGrid = GridBuilder.BuildFromXML(@"C:\Users\Felix Liu\source\repos\FTGridbuilding\TileGrid.xml");
-
 		for (int i = 0; i < numberOfAgents; i++)
 		{
-			GameObject p = Instantiate(Point, new Vector3(Random.Range(0, BackGroundScale), Random.Range(0, BackGroundScale), 0),
-				Quaternion.identity);
+			GameObject p = Instantiate(Point, new Vector3(Random.Range(10f, 14f), Random.Range(14f, 18f), 0), Quaternion.identity);
+			p.GetComponent<MovingPoint>().FollowingLayer = 1;
 			p.GetComponent<MovingPoint>().MainRef = this;
+			loadAgentIntoTile(p);
 		}
+
+        /*
+		for (int i = 0; i < numberOfAgents / 2; i++)
+		{
+			GameObject p = Instantiate(Point, new Vector3(Random.Range(9f, 11f), 7, 0),
+				Quaternion.identity);
+			p.GetComponent<MovingPoint>().FollowingLayer = 2;
+			p.GetComponent<MovingPoint>().MainRef = this;
+			loadAgentIntoTile(p);
+		}
+        */
 	}
 }
