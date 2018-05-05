@@ -182,9 +182,6 @@ namespace Script.FlowTileUtils
 
             return ((vTopRight - vBotRight) * y + vBotRight - (vTopLeft - vBotLeft) * y - vBotLeft) * x +
                    (vTopLeft - vBotLeft) * y + vBotLeft;
-            
-            
-            return VelocityGrid[y, x];
         }
         
         /// <summary>
@@ -362,6 +359,16 @@ namespace Script.FlowTileUtils
         public void SetVelocity(double x, double y, double vx, double vy)
         {
             VelocityGrid[(int)(x * GridSize), (int)(y * GridSize)] = new Vector2((float)vx, (float)vy);
+        }
+
+        public void SetVelocity(int row, int col, Vector2 velocity)
+        {
+            VelocityGrid[row, col] = velocity;
+        }
+
+        public Vector2 GetVelocity(int row, int col)
+        {
+            return VelocityGrid[row, col];
         }
 
         public XmlElement ToXmlElement(XmlDocument xmlDoc)

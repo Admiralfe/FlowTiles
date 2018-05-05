@@ -57,6 +57,69 @@ public class TileGrid : IEnumerable<FlowTile>
         return true;
     }
 
+    /// <summary>
+    /// Interpolates the velocities at the edges so that adjacent tiles edge velocities match. 
+    /// </summary>
+    /// <exception cref="MissingFieldException"></exception>
+    public void SmoothenEdges()
+    {
+        int FlowTileSize = GetFlowTile(0, 0).GridSize;
+        if (!isFull())
+        {
+            throw new MissingFieldException("The whole TileGrid must be filled before its edges can be smoothened.");
+        }
+
+        for (int i = 1; i < Dimension - 1; i++)
+        {
+            for (int j = 1; j < Dimension - 1; j++)
+            {
+                FlowTile tile = GetFlowTile(i, j);
+                FlowTile tileAbove = GetFlowTile(i - 1, j);
+                FlowTile tileRight = GetFlowTile(i, j + 1);
+                FlowTile tileRightAbove = GetFlowTile(i - 1, j + 1);
+                Vector2 interpolatedVelocity = (tile.GetVelocity(0, FlowTileSize - 1) +
+                                                tileAbove.GetVelocity(FlowTileSize - 1, FlowTileSize - 1) +
+                                                tileRight.GetVelocity(0, 0) +
+                                                tileRightAbove.GetVelocity(FlowTileSize - 1, 0)) / 4;
+                tile.SetVelocity(0, FlowTileSize - 1, interpolatedVelocity);
+                tileAbove.SetVelocity(FlowTileSize - 1, FlowTileSize - 1, interpolatedVelocity);
+                tileRight.SetVelocity(0, 0, interpolatedVelocity);
+                tileRightAbove.SetVelocity(FlowTileSize - 1, 0, interpolatedVelocity);
+
+            }
+        }
+        for (int i = 0; i < Dimension; i++)
+        {
+            for (int j = 0; j < Dimension; j++)
+            {
+                FlowTile tile = GetFlowTile(i, j);
+                
+                if(i != 0)
+                {
+                    FlowTile tileAbove = GetFlowTile(i - 1, j);
+                    for (int k = 1; k < FlowTileSize - 1; k++)
+                    {
+                        Vector2 interpolatedVelocity =
+                            (tile.GetVelocity(0, k) + tileAbove.GetVelocity(FlowTileSize - 1, k)) / 2;
+                        tile.SetVelocity(0, k, interpolatedVelocity);
+                        tile.SetVelocity(FlowTileSize - 1, k, interpolatedVelocity);
+                    }
+                }
+
+                if (j != Dimension - 1)
+                {
+                    for (int k = 1; k < FlowTileSize - 1; k++)
+                    {
+                        FlowTile tileRight = GetFlowTile(i, j + 1);
+                        Vector2 interpolatedVelocity = (tile.GetVelocity(k, FlowTileSize - 1) + tileRight.GetVelocity(k, 0)) / 2;
+                        tile.SetVelocity(k, FlowTileSize -1, interpolatedVelocity );
+                        tileRight.SetVelocity(k, 0, interpolatedVelocity);
+                    }
+                }
+            }
+        }
+    }
+
     public int[] GetRowColIndexes(float x, float y)
     {
         int rowIndex = (int) Math.Floor(y * Dimension);
