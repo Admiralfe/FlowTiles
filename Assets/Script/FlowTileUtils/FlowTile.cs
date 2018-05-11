@@ -1,4 +1,4 @@
-﻿using Script.FlowTileUtils;
+﻿﻿using Script.FlowTileUtils;
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -167,6 +167,12 @@ namespace Script.FlowTileUtils
         public Vector2 Velocity(int x, int y)
         {
             return VelocityGrid[y, x];
+        }
+
+        public Vector3 Velocity3D(float relX, float relZ) 
+        {
+            Vector2 Velocity2D = Velocity(relX, relZ);
+            return new Vector3(Velocity2D.x, 0, Velocity2D.y);
         }
         
         /// <summary>
@@ -385,12 +391,12 @@ namespace Script.FlowTileUtils
 
         public void SetVelocity(int row, int col, Vector2 velocity)
         {
-            VelocityGrid[row, col] = velocity;
+            VelocityGrid[col, GridSize - 1- row] = velocity;
         }
 
         public Vector2 GetVelocity(int row, int col)
         {
-            return VelocityGrid[row, col];
+            return VelocityGrid[col, GridSize - 1 - row];
         }
 
         public XmlElement ToXmlElement(XmlDocument xmlDoc)

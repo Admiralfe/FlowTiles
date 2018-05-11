@@ -26,8 +26,8 @@ public class Main : MonoBehaviour
 
 	private void loadAgentIntoTile(GameObject agent) 
 	{
-		int[] rowColIndex = TileGrid_1.GetRowColIndexes(transform.position.x / BackGroundScale,
-        	transform.position.y / BackGroundScale);
+		int[] rowColIndex = TileGrid_1.GetRowColIndexes(agent.transform.position.x / (float) BackGroundScale,
+        	agent.transform.position.y / (float) BackGroundScale);
 
 		TileGrid_1.GetFlowTile(TileGridDimension - rowColIndex[0] - 1, rowColIndex[1]).Agents.Add(agent);
 	}	
@@ -57,6 +57,7 @@ public class Main : MonoBehaviour
 		for (int i = 0; i < numberOfAgents; i++)
 		{
 			GameObject p = Instantiate(Point, new Vector3(Random.Range(13f, 15f), Random.Range(15f, 17f), 0), Quaternion.identity);
+			p.transform.rotation = Quaternion.AngleAxis(90, Vector3.right);
 			p.GetComponent<MovingPoint>().FollowingLayer = 1;
 			p.GetComponent<MovingPoint>().MainRef = this;
 			loadAgentIntoTile(p);

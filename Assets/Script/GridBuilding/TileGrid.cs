@@ -74,9 +74,9 @@ public class TileGrid : IEnumerable<FlowTile>
             throw new MissingFieldException("The whole TileGrid must be filled before its edges can be smoothened.");
         }
 
-        for (int i = 1; i < Dimension - 1; i++)
+        for (int i = 1; i < Dimension; i++)
         {
-            for (int j = 1; j < Dimension - 1; j++)
+            for (int j = 0; j < Dimension - 1; j++)
             {
                 FlowTile tile = GetFlowTile(i, j);
                 FlowTile tileAbove = GetFlowTile(i - 1, j);
@@ -105,7 +105,9 @@ public class TileGrid : IEnumerable<FlowTile>
                     for (int k = 1; k < FlowTileSize - 1; k++)
                     {
                         Vector2 interpolatedVelocity =
-                            (tile.GetVelocity(0, k) + tileAbove.GetVelocity(FlowTileSize - 1, k)) / 2;
+                            (tile.GetVelocity(0, k) + tileAbove.GetVelocity(FlowTileSize - 1, k)).normalized 
+                            * (tile.GetVelocity(0, k).magnitude + tileAbove.GetVelocity(FlowTileSize - 1, k).magnitude) / 2;
+                        //  Debug.Log(interpolatedVelocity.magnitude);
                         tile.SetVelocity(0, k, interpolatedVelocity);
                         tile.SetVelocity(FlowTileSize - 1, k, interpolatedVelocity);
                     }
@@ -116,7 +118,10 @@ public class TileGrid : IEnumerable<FlowTile>
                     for (int k = 1; k < FlowTileSize - 1; k++)
                     {
                         FlowTile tileRight = GetFlowTile(i, j + 1);
-                        Vector2 interpolatedVelocity = (tile.GetVelocity(k, FlowTileSize - 1) + tileRight.GetVelocity(k, 0)) / 2;
+                        Vector2 interpolatedVelocity = 
+                            (tile.GetVelocity(k, FlowTileSize - 1) + tileRight.GetVelocity(k, 0)).normalized
+                            * (tile.GetVelocity(k, FlowTileSize - 1).magnitude + tileRight.GetVelocity(k, 0).magnitude) / 2;
+                        //Debug.Log(interpolatedVelocity.magnitude);
                         tile.SetVelocity(k, FlowTileSize -1, interpolatedVelocity );
                         tileRight.SetVelocity(k, 0, interpolatedVelocity);
                     }

@@ -118,7 +118,7 @@ public class MovingPoint : MonoBehaviour
 	{
         rowColIndex = MainRef.TileGrid_1.GetRowColIndexes(transform.position.x / MainRef.BackGroundScale,
         	transform.position.y / MainRef.BackGroundScale);
-        
+         
         //Relative position the point has IN the tile it is currently in, from 0 to 1.
         float relXPos = (transform.position.x - rowColIndex[1] * MainRef.GetTileWidth()) / MainRef.GetTileWidth();
         float relYPos = (transform.position.y - rowColIndex[0] * MainRef.GetTileWidth()) / MainRef.GetTileWidth();
@@ -133,6 +133,8 @@ public class MovingPoint : MonoBehaviour
         }
 
         collisionAvoidance(relXPos, relYPos);
+
+        //Debug.Log("Point speed: " + Velocity.magnitude);
 
         transform.Translate(Velocity * Time.deltaTime);
 
