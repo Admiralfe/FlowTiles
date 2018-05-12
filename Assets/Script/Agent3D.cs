@@ -19,7 +19,7 @@ public class Agent3D : MonoBehaviour
 	void Start()
 	{
 		Velocity = Vector3.zero;
-        collisionRadius = 0.8f;
+        collisionRadius = 1f;
         animator = gameObject.GetComponent<Animator>();
 	}   
 	
@@ -147,13 +147,13 @@ public class Agent3D : MonoBehaviour
 
         //transform.Translate(Velocity * Time.deltaTime);
         transform.position += Velocity * Time.deltaTime;
-        if ((transform.rotation.eulerAngles.y - Quaternion.LookRotation(Velocity).eulerAngles.y) > 20f)
+        if ((transform.rotation.eulerAngles.y - Quaternion.LookRotation(Velocity).eulerAngles.y) > 10f)
         {
-            transform.Rotate(new Vector3(0, -20f, 0));
+            transform.Rotate(new Vector3(0, -10f, 0));
         }
-        else if((transform.rotation.eulerAngles.y - Quaternion.LookRotation(Velocity).eulerAngles.y) < -20f)
+        else if((transform.rotation.eulerAngles.y - Quaternion.LookRotation(Velocity).eulerAngles.y) < -10f)
         {
-            transform.Rotate(new Vector3(0, 20f, 0));
+            transform.Rotate(new Vector3(0, 10f, 0));
         }
         else
         {
