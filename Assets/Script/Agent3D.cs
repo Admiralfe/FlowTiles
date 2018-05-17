@@ -155,10 +155,11 @@ public class Agent3D : MonoBehaviour
         {
             transform.Rotate(new Vector3(0, 10f, 0));
         }
-        else
+        else if (Mathf.Abs(transform.rotation.eulerAngles.y - Quaternion.LookRotation(Velocity).eulerAngles.y) > 5f)
         {
             transform.rotation = Quaternion.LookRotation(Velocity);
         }
+
         if (Velocity.magnitude < 0.05f) 
         {
             animator.speed = 0;
