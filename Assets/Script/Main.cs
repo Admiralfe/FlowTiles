@@ -34,12 +34,12 @@ public class Main : MonoBehaviour
 	
 	private void Start ()
 	{
-        //TileGrid_1 = GridBuilder.BuildFromXML("/home/felix/FTGridBuilding/Tilings/Curve.xml");
+        TileGrid_1 = GridBuilder.BuildFromXML("/home/felix/FTGridBuilding/Tilings/Curve.xml");
         //TileGrid_2 = GridBuilder.BuildFromXML("/home/felix/FTGridBuilding/Tilings/TileGridVertical.xml");
 
 
-
-        TileGrid_1 = GridBuilder.BuildFromXML(@"C:\Users\Felix Liu\source\repos\FTGridBuilding\Tilings\Curve.xml");
+	
+        //TileGrid_1 = GridBuilder.BuildFromXML(@"C:\Users\Felix Liu\source\repos\FTGridBuilding\Tilings\Curve.xml");
         //TileGrid_2 = GridBuilder.BuildFromXML(@"C:\Users\Felix Liu\source\repos\FTGridBuilding\TileGridVertical.xml");
 
         TileGrid_1.SmoothenEdges();

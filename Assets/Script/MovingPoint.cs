@@ -19,8 +19,12 @@ public class MovingPoint : MonoBehaviour
 	{
 		Velocity = Vector2.zero;
         collisionRadius = 0.1f;
-	}
+    }
 	
+    /// <summary>
+    /// Updates which tile the agent is currently in and removes agent from the bucket corresponding
+    /// to its previous tile and adds it to the bucket of the current tile. This is for more efficient collision detection.
+    /// </summary>
     private void updateCurrentTile() 
     {
         if (MainRef.TileGrid_1.GetRowColIndexes(transform.position.x / MainRef.BackGroundScale,
@@ -35,6 +39,12 @@ public class MovingPoint : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Performs collision avoidance between an agent and other agents in its tile, including the neighboring tiles
+    /// if the agent is close enough to the edge of a tile. Colldiing agents will adjust their velocities to move away from each other.
+    /// </summary>
+    /// <param name="relXPos"> A float between 0 and 1 describing the agents relative x-position in the tile </param>
+    /// <param name="relYPos"> A float between 0 and 1 describing the agents relative y-position in the tile </param>
     private void collisionAvoidance(float relXPos, float relYPos)
     {
         FlowTile currentTile = MainRef.TileGrid_1.GetFlowTile(MainRef.TileGridDimension - rowColIndex[0] - 1, rowColIndex[1]);

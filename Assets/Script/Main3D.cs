@@ -23,7 +23,11 @@ public class Main3D : MonoBehaviour
 	{
         return BackGroundScale / TileGridDimension;
 	}
-
+	
+	/// <summary>
+	/// Loads agent into bucket according to their current tile. This is used for collision detection between agents.
+	/// </summary>
+	/// <param name="agent"> Agent to be loaded. </param>
 	private void loadAgentIntoTile(GameObject agent) 
 	{
 		int[] rowColIndex = TileGrid_1.GetRowColIndexes(agent.transform.position.x / BackGroundScale,
@@ -36,10 +40,10 @@ public class Main3D : MonoBehaviour
 	
 	private void Start ()
 	{
-        //TileGrid_1 = GridBuilder.BuildFromXML("/home/felix/FTGridBuilding/Tilings/Curve.xml");
+        TileGrid_1 = GridBuilder.BuildFromXML("/home/felix/FTGridBuilding/Tilings/Curve.xml");
         //TileGrid_2 = GridBuilder.BuildFromXML("/home/felix/FTGridBuilding/Tilings/TileGridVertical.xml");
 
-        TileGrid_1 = GridBuilder.BuildFromXML(@"C:\Users\Felix Liu\source\repos\FTGridBuilding\Tilings\Curve.xml");
+        //TileGrid_1 = GridBuilder.BuildFromXML(@"C:\Users\Felix Liu\source\repos\FTGridBuilding\Tilings\Curve.xml");
         //TileGrid_2 = GridBuilder.BuildFromXML(@"C:\Users\Felix Liu\source\repos\FTGridBuilding\TileGridVertical.xml");
 
         TileGrid_1.SmoothenEdges();
@@ -55,7 +59,16 @@ public class Main3D : MonoBehaviour
 
 		for (int i = 0; i < numberOfAgents; i++)
 		{
-			GameObject agent = Instantiate(Agent, new Vector3(Random.Range(3f, 12f), 0, Random.Range(14f, 19f)), Quaternion.identity);
+			GameObject agent = Instantiate(Agent, new Vector3(Random.Range(1f, 18f), 0, Random.Range(14f, 19f)), Quaternion.identity);
+			agent.transform.rotation = Quaternion.LookRotation(new Vector3(1f, 0, 0));
+			agent.GetComponent<Agent3D>().FollowingLayer = 1;
+			agent.GetComponent<Agent3D>().MainRef = this;
+			loadAgentIntoTile(agent);
+		}
+		
+		for (int i = 0; i < numberOfAgents; i++)
+		{
+			GameObject agent = Instantiate(Agent, new Vector3(Random.Range(14f, 19f), 0, Random.Range(1f, 12f)), Quaternion.identity);
 			agent.transform.rotation = Quaternion.LookRotation(new Vector3(1f, 0, 0));
 			agent.GetComponent<Agent3D>().FollowingLayer = 1;
 			agent.GetComponent<Agent3D>().MainRef = this;

@@ -19,7 +19,7 @@ public class Agent3D : MonoBehaviour
 	void Start()
 	{
 		Velocity = Vector3.zero;
-        collisionRadius = 1 f;
+        collisionRadius = 1f;
         animator = gameObject.GetComponent<Animator>();
 	}   
 	
